@@ -1,0 +1,3 @@
+jwt-security:
+  secret: PseudoSecret-Pseudosecret-Please-Use-Ur-Own-Key-PseudoSecret-Pseudosecret
+  expiration-time: 365
