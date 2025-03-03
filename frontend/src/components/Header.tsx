@@ -82,7 +82,7 @@ const Header = () => {
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap component="div">
-          Waste Management System
+          Material Management System
         </Typography>
         <Search>
           <SearchIconWrapper>
