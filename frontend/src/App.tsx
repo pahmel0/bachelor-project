@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material";
 import Layout from "./components/Layout";
+import Home from "./pages/Home";
 
 // Create theme
 const theme = createTheme({
@@ -16,10 +17,52 @@ const theme = createTheme({
       paper: "#ffffff",
     },
   },
+  typography: {
+    h1: {
+      fontSize: "2.5rem",
+      fontWeight: 600,
+    },
+    h2: {
+      fontSize: "2rem",
+      fontWeight: 600,
+    },
+    h3: {
+      fontSize: "1.75rem",
+      fontWeight: 600,
+    },
+    h4: {
+      fontSize: "1.5rem",
+      fontWeight: 600,
+    },
+    h5: {
+      fontSize: "1.25rem",
+      fontWeight: 600,
+    },
+    h6: {
+      fontSize: "1rem",
+      fontWeight: 600,
+    },
+  },
+  components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+      },
+    },
+  },
 });
 
 // Placeholder components for routes
-const Dashboard = () => <div>Dashboard Content</div>;
 const Materials = () => <div>Materials Inventory Content</div>;
 const Import = () => <div>Import/New Entry Content</div>;
 const Reports = () => <div>Reports Content</div>;
@@ -31,7 +74,7 @@ function App() {
       <Router>
         <Layout>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Home />} />
             <Route path="/materials" element={<Materials />} />
             <Route path="/import" element={<Import />} />
             <Route path="/reports" element={<Reports />} />
