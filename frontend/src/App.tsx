@@ -3,6 +3,7 @@ import { ThemeProvider, createTheme } from "@mui/material";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Materials from "./pages/Materials";
+import ImportMaterial from "./pages/ImportMaterial";
 
 // Create theme
 const theme = createTheme({
@@ -64,7 +65,6 @@ const theme = createTheme({
 });
 
 // Placeholder components for routes
-const Import = () => <div>Import/New Entry Content</div>;
 const Reports = () => <div>Reports Content</div>;
 const Settings = () => <div>Settings Content</div>;
 
@@ -76,7 +76,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/materials" element={<Materials />} />
-            <Route path="/import" element={<Import />} />
+            <Route path="/import" element={<ImportMaterial />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
