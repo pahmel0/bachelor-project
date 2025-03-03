@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
+import Materials from "./pages/Materials";
 
 // Create theme
 const theme = createTheme({
@@ -63,7 +64,6 @@ const theme = createTheme({
 });
 
 // Placeholder components for routes
-const Materials = () => <div>Materials Inventory Content</div>;
 const Import = () => <div>Import/New Entry Content</div>;
 const Reports = () => <div>Reports Content</div>;
 const Settings = () => <div>Settings Content</div>;
