@@ -4,6 +4,7 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Materials from "./pages/Materials";
 import ImportMaterial from "./pages/ImportMaterial";
+import MaterialDetail from "./pages/MaterialDetail";
 
 // Create theme
 const theme = createTheme({
@@ -76,6 +77,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/materials" element={<Materials />} />
+            <Route path="/materials/:id" element={<MaterialDetail />} />
             <Route path="/import" element={<ImportMaterial />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/settings" element={<Settings />} />
