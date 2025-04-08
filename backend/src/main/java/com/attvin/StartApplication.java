@@ -1,13 +1,13 @@
-package com.attvin.waste_management;
+package com.attvin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class WasteManagementApplication {
+public class StartApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(WasteManagementApplication.class, args);
+		SpringApplication.run(StartApplication.class, args);
 	}
 
 }
