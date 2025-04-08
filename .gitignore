@@ -1,3 +1,5 @@
 .cursor/rules/general.mdc
 .qodo
 .vscode/
+backend/derby.log
+.vscode/settings.json

@@ -91,10 +91,17 @@
 			<scope>runtime</scope>
 		</dependency>
 		
-		<!-- H2 Database for Testing -->
+		
+		<!-- Apache Derby for Testing -->
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>10.17.1.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbytools</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		
@@ -141,3 +148,4 @@
 	</build>
 
 </project>
+
