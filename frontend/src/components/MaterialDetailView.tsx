@@ -1,131 +1,84 @@
 import React from "react";
 import { Box, Typography, Grid, Chip, Divider, Paper } from "@mui/material";
-import { Material } from "./MaterialsGrid";
+import { format } from "date-fns";
+import { Material } from "../types/material";
 
 interface MaterialDetailViewProps {
   material: Material;
 }
+
+// Helper function to format date
+const formatDate = (dateValue: Date | string): string => {
+  if (typeof dateValue === "string") {
+    return format(new Date(dateValue), "MMM d, yyyy");
+  }
+  return format(dateValue, "MMM d, yyyy");
+};
 
 const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
   material,
 }) => {
   return (
     <Box>
-      <Grid container spacing={4}>
-        {/* Left column - Image */}
-        <Grid item xs={12} md={4}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
           <Paper
             sx={{
-              width: "100%",
+              p: 2,
               height: 300,
               display: "flex",
-              justifyContent: "center",
               alignItems: "center",
-              overflow: "hidden",
-              mb: 2,
+              justifyContent: "center",
+              backgroundImage: `url(${material.imageUrl})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
             }}
-          >
-            <img
-              src={material.imageUrl}
-              alt={material.name}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-          </Paper>
-
-          <Typography variant="caption" color="text.secondary" display="block">
-            Added on {material.dateAdded.toLocaleDateString()}
-          </Typography>
+          />
         </Grid>
-
-        {/* Right column - Details */}
-        <Grid item xs={12} md={8}>
-          <Typography variant="h5" component="h2" gutterBottom>
-            {material.name}
-          </Typography>
-
-          <Box sx={{ mb: 3 }}>
-            <Grid container spacing={1}>
-              <Grid item>
-                <Chip
-                  label={material.objectType}
-                  color="primary"
-                  variant="outlined"
-                  size="small"
-                />
-              </Grid>
-              <Grid item>
-                <Chip
-                  label={material.material}
-                  color="secondary"
-                  variant="outlined"
-                  size="small"
-                />
-              </Grid>
-              <Grid item>
-                <Chip
-                  label={material.condition}
-                  color="default"
-                  variant="outlined"
-                  size="small"
-                />
-              </Grid>
-            </Grid>
-          </Box>
-
-          <Divider sx={{ mb: 3 }} />
-
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Dimensions
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {material.dimensions}
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Material Type
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {material.material}
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Object Type
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {material.objectType}
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Condition
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {material.condition}
-              </Typography>
-            </Grid>
-          </Grid>
-
-          <Divider sx={{ my: 3 }} />
-
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Additional Notes
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2, height: "100%" }}>
+            <Typography variant="h5" gutterBottom>
+              {material.name}
             </Typography>
-            <Typography variant="body1">
-              {material.notes || "No additional notes provided."}
+            <Divider sx={{ my: 2 }} />
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                flexWrap: "wrap",
+                mb: 2,
+              }}
+            >
+              <Chip label={material.objectType} color="primary" />
+              <Chip label={material.material} color="secondary" />
+              <Chip
+                label={material.condition}
+                color={
+                  material.condition === "Reusable"
+                    ? "success"
+                    : material.condition === "Repairable"
+                    ? "warning"
+                    : "error"
+                }
+              />
+            </Box>
+            <Typography variant="body1" gutterBottom>
+              <strong>Dimensions:</strong> {material.dimensions}
             </Typography>
-          </Box>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="block"
+            >
+              Added on {formatDate(material.dateAdded)}
+            </Typography>
+            {material.notes && (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="body2">{material.notes}</Typography>
+              </>
+            )}
+          </Paper>
         </Grid>
       </Grid>
     </Box>
