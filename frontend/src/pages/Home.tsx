@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -7,6 +8,7 @@ import {
   Paper,
   Divider,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 import {
   Inventory as InventoryIcon,
@@ -15,37 +17,95 @@ import {
   Build as BuildIcon,
 } from "@mui/icons-material";
 import ActivityFeed from "../components/ActivityFeed";
-
-// Mock data for dashboard metrics
-const dashboardMetrics = [
-  {
-    title: "Total Materials",
-    value: 1248,
-    icon: <InventoryIcon fontSize="large" />,
-    color: "#2196f3",
-  },
-  {
-    title: "Damaged Items",
-    value: 156,
-    icon: <WarningIcon fontSize="large" />,
-    color: "#f44336",
-  },
-  {
-    title: "Reusable Items",
-    value: 892,
-    icon: <RecyclingIcon fontSize="large" />,
-    color: "#4caf50",
-  },
-  {
-    title: "Repairable Items",
-    value: 200,
-    icon: <BuildIcon fontSize="large" />,
-    color: "#ff9800",
-  },
-];
+import materialService from "../services/materialService";
+import { MaterialStats } from "../types/material";
 
 const Home = () => {
   const theme = useTheme();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<MaterialStats | null>(null);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const statsData = await materialService.getMaterialStats();
+        setStats(statsData);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch dashboard data:", err);
+        setError("Failed to load dashboard data. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  // Default metrics template
+  const getDashboardMetrics = () => {
+    if (!stats) return [];
+
+    const reusableCount = stats.conditionCounts["Reusable"] || 0;
+    const repairableCount = stats.conditionCounts["Repairable"] || 0;
+    const damagedCount = stats.conditionCounts["Damaged"] || 0;
+
+    return [
+      {
+        title: "Total Materials",
+        value: stats.totalCount,
+        icon: <InventoryIcon fontSize="large" />,
+        color: "#2196f3",
+      },
+      {
+        title: "Damaged Items",
+        value: damagedCount,
+        icon: <WarningIcon fontSize="large" />,
+        color: "#f44336",
+      },
+      {
+        title: "Reusable Items",
+        value: reusableCount,
+        icon: <RecyclingIcon fontSize="large" />,
+        color: "#4caf50",
+      },
+      {
+        title: "Repairable Items",
+        value: repairableCount,
+        icon: <BuildIcon fontSize="large" />,
+        color: "#ff9800",
+      },
+    ];
+  };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "50vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography color="error" variant="h6">
+          {error}
+        </Typography>
+      </Box>
+    );
+  }
+
+  const dashboardMetrics = getDashboardMetrics();
 
   return (
     <Box>
