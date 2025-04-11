@@ -12,19 +12,8 @@ import {
   CardActions,
   Button,
 } from "@mui/material";
-
-// Mock data interface
-export interface Material {
-  id: number;
-  name: string;
-  imageUrl: string;
-  objectType: string;
-  material: string;
-  condition: string;
-  dateAdded: Date;
-  dimensions: string;
-  notes?: string;
-}
+import { Material } from "../types/material";
+import { format } from "date-fns";
 
 interface MaterialsGridProps {
   materials: Material[];
@@ -35,6 +24,14 @@ const MaterialsGrid: React.FC<MaterialsGridProps> = ({ materials }) => {
 
   const handleViewDetails = (id: number) => {
     navigate(`/materials/${id}`);
+  };
+
+  // Helper function to format date from string or Date object
+  const formatDate = (dateValue: Date | string): string => {
+    if (typeof dateValue === "string") {
+      return format(new Date(dateValue), "MMM d, yyyy");
+    }
+    return format(dateValue, "MMM d, yyyy");
   };
 
   return (
@@ -82,6 +79,9 @@ const MaterialsGrid: React.FC<MaterialsGridProps> = ({ materials }) => {
                 </Box>
                 <Typography variant="body2" color="text.secondary">
                   Dimensions: {material.dimensions}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Added: {formatDate(material.dateAdded)}
                 </Typography>
               </CardContent>
             </CardActionArea>
