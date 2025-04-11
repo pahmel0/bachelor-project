@@ -11,6 +11,7 @@ export interface Material {
   dateAdded: Date | string;
   dimensions: string;
   notes?: string;
+  color?: string;
 }
 
 /**
