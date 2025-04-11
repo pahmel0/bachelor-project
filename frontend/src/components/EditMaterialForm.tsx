@@ -12,11 +12,11 @@ import {
   FormHelperText,
   SelectChangeEvent,
 } from "@mui/material";
-import { Material } from "./MaterialsGrid";
+import { Material } from "../types/material";
 
 interface EditMaterialFormProps {
   material: Material;
-  onSave: (updatedMaterial: Material) => void;
+  onSave: (material: Material) => void;
   onCancel: () => void;
 }
 
