@@ -30,12 +30,24 @@ const Materials = () => {
       try {
         setLoading(true);
         const data = await materialService.getAllMaterials();
+        console.log("Fetched materials:", data);
+
+        if (!data || !Array.isArray(data)) {
+          console.error("Invalid materials data format:", data);
+          setError("Invalid data format received from server");
+          setMaterials([]);
+          setFilteredMaterials([]);
+          return;
+        }
+
         setMaterials(data);
         setFilteredMaterials(data);
         setError(null);
       } catch (err) {
         console.error("Failed to fetch materials:", err);
         setError("Failed to load materials. Please try again later.");
+        setMaterials([]);
+        setFilteredMaterials([]);
       } finally {
         setLoading(false);
       }
@@ -53,29 +65,35 @@ const Materials = () => {
       const query = searchQuery.toLowerCase();
       result = result.filter(
         (material) =>
-          material.name.toLowerCase().includes(query) ||
-          material.objectType.toLowerCase().includes(query) ||
-          material.material.toLowerCase().includes(query) ||
-          material.condition.toLowerCase().includes(query)
+          (material.name?.toLowerCase() || "").includes(query) ||
+          (material.objectType?.toLowerCase() || "").includes(query) ||
+          (material.material?.toLowerCase() || "").includes(query) ||
+          (material.condition?.toLowerCase() || "").includes(query)
       );
     }
 
     // Apply category filters
     if (filters.objectTypes.length > 0) {
       result = result.filter((material) =>
-        filters.objectTypes.includes(material.objectType)
+        material.objectType
+          ? filters.objectTypes.includes(material.objectType)
+          : false
       );
     }
 
     if (filters.materialTypes.length > 0) {
       result = result.filter((material) =>
-        filters.materialTypes.includes(material.material)
+        material.material
+          ? filters.materialTypes.includes(material.material)
+          : false
       );
     }
 
     if (filters.conditions.length > 0) {
       result = result.filter((material) =>
-        filters.conditions.includes(material.condition)
+        material.condition
+          ? filters.conditions.includes(material.condition)
+          : false
       );
     }
 
@@ -123,7 +141,11 @@ const Materials = () => {
         <SearchFilterBar onSearch={handleSearch} onFilter={handleFilter} />
       </Paper>
 
-      {filteredMaterials.length === 0 ? (
+      {!Array.isArray(filteredMaterials) ? (
+        <Box sx={{ p: 3, textAlign: "center" }}>
+          <Typography variant="h6">Error loading materials data</Typography>
+        </Box>
+      ) : filteredMaterials.length === 0 ? (
         <Box sx={{ p: 3, textAlign: "center" }}>
           <Typography variant="h6">
             No materials found matching your criteria
