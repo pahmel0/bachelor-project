@@ -1,6 +1,7 @@
 package com.attvin.controller;
 
 import com.attvin.dto.MaterialRecordDTO;
+import com.attvin.dto.MaterialStatsDTO;
 import com.attvin.service.MaterialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -53,6 +54,11 @@ public class MaterialController {
             @RequestParam(required = false) String query,
             Pageable pageable) {
         return ResponseEntity.ok(materialService.searchMaterials(category, type, condition, query, pageable));
+    }
+    
+    @GetMapping("/stats")
+    public ResponseEntity<MaterialStatsDTO> getMaterialStats() {
+        return ResponseEntity.ok(materialService.getMaterialStats());
     }
     
     @PostMapping("/import")
