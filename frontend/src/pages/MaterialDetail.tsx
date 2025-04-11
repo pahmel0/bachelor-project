@@ -15,6 +15,7 @@ import {
   IconButton,
   Snackbar,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -22,46 +23,10 @@ import {
   ContentCopy as DuplicateIcon,
   ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
-import { Material } from "../components/MaterialsGrid";
 import MaterialDetailView from "../components/MaterialDetailView";
 import EditMaterialForm from "../components/EditMaterialForm";
-
-// Mock data for a single material
-const mockMaterial: Material = {
-  id: 1,
-  name: "Wooden Chair",
-  imageUrl: "https://images.unsplash.com/photo-1503602642458-232111445657",
-  objectType: "Furniture",
-  material: "Wood",
-  condition: "Reusable",
-  dateAdded: new Date(2023, 4, 15),
-  dimensions: "45 x 45 x 90 cm",
-};
-
-// Mock audit history
-const mockAuditHistory = [
-  {
-    id: 1,
-    action: "created",
-    user: "John Doe",
-    timestamp: new Date(2023, 4, 15, 10, 30),
-    details: "Material was added to the system",
-  },
-  {
-    id: 2,
-    action: "edited",
-    user: "Jane Smith",
-    timestamp: new Date(2023, 4, 16, 14, 45),
-    details: 'Changed condition from "Damaged" to "Reusable"',
-  },
-  {
-    id: 3,
-    action: "viewed",
-    user: "Mike Johnson",
-    timestamp: new Date(2023, 4, 18, 9, 15),
-    details: "Material details were viewed",
-  },
-];
+import { Material, Activity } from "../types/material";
+import materialService from "../services/materialService";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -89,6 +54,7 @@ const MaterialDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [material, setMaterial] = useState<Material | null>(null);
+  const [auditHistory, setAuditHistory] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [tabValue, setTabValue] = useState(0);
@@ -101,11 +67,37 @@ const MaterialDetail = () => {
 
   // Fetch material data
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setMaterial(mockMaterial);
-      setIsLoading(false);
-    }, 500);
+    if (!id) return;
+
+    const fetchMaterialData = async () => {
+      try {
+        setIsLoading(true);
+        const materialId = parseInt(id);
+        const materialData = await materialService.getMaterial(materialId);
+        setMaterial(materialData);
+
+        // Fetch activity history related to this material
+        try {
+          const activityData = await materialService.getRecentActivity();
+          // Filter activities related to this material
+          const materialActivities = activityData.filter(
+            (activity) => activity.materialId === materialId
+          );
+          setAuditHistory(materialActivities);
+        } catch (activityError) {
+          console.error("Failed to fetch activity history:", activityError);
+        }
+      } catch (err) {
+        console.error(`Failed to fetch material ${id}:`, err);
+        setSnackbarMessage("Failed to load material details");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMaterialData();
   }, [id]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -116,15 +108,25 @@ const MaterialDetail = () => {
     setIsEditing(true);
   };
 
-  const handleSave = (updatedMaterial: Material) => {
-    // Simulate API call to update material
-    setTimeout(() => {
+  const handleSave = async (updatedMaterial: Material) => {
+    try {
+      setIsLoading(true);
+      if (!id) return;
+
+      await materialService.updateMaterial(parseInt(id), updatedMaterial);
       setMaterial(updatedMaterial);
       setIsEditing(false);
       setSnackbarMessage("Material updated successfully");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
-    }, 500);
+    } catch (err) {
+      console.error("Failed to update material:", err);
+      setSnackbarMessage("Failed to update material");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -135,9 +137,12 @@ const MaterialDetail = () => {
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
-    // Simulate API call to delete material
-    setTimeout(() => {
+  const confirmDelete = async () => {
+    try {
+      setIsLoading(true);
+      if (!id) return;
+
+      await materialService.deleteMaterial(parseInt(id));
       setDeleteDialogOpen(false);
       setSnackbarMessage("Material deleted successfully");
       setSnackbarSeverity("success");
@@ -147,22 +152,61 @@ const MaterialDetail = () => {
       setTimeout(() => {
         navigate("/materials");
       }, 1500);
-    }, 500);
+    } catch (err) {
+      console.error("Failed to delete material:", err);
+      setDeleteDialogOpen(false);
+      setSnackbarMessage("Failed to delete material");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDuplicate = () => {
-    // Simulate API call to duplicate material
-    setTimeout(() => {
+  const handleDuplicate = async () => {
+    try {
+      setIsLoading(true);
+      if (!material) return;
+
+      // Create a copy of the material without the ID
+      const newMaterial = {
+        ...material,
+        id: undefined, // This will be assigned by the backend
+        name: `${material.name} (Copy)`,
+      };
+
+      // Remove the id property before sending to API
+      delete newMaterial.id;
+
+      await materialService.createMaterial(newMaterial);
       setSnackbarMessage("Material duplicated successfully");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
-    }, 500);
+    } catch (err) {
+      console.error("Failed to duplicate material:", err);
+      setSnackbarMessage("Failed to duplicate material");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   if (isLoading) {
     return (
-      <Box sx={{ p: 3 }}>
-        <Typography>Loading material details...</Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "50vh",
+        }}
+      >
+        <CircularProgress />
       </Box>
     );
   }
@@ -202,119 +246,103 @@ const MaterialDetail = () => {
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h4" component="h1">
-            Material Details
+            {material.name}
           </Typography>
         </Box>
-
         <Box>
-          {!isEditing && (
-            <>
-              <Button
-                startIcon={<EditIcon />}
-                variant="outlined"
-                onClick={handleEdit}
-                sx={{ mr: 1 }}
-              >
-                Edit
-              </Button>
-              <Button
-                startIcon={<DuplicateIcon />}
-                variant="outlined"
-                onClick={handleDuplicate}
-                sx={{ mr: 1 }}
-              >
-                Duplicate
-              </Button>
-              <Button
-                startIcon={<DeleteIcon />}
-                variant="outlined"
-                color="error"
-                onClick={handleDelete}
-              >
-                Delete
-              </Button>
-            </>
-          )}
+          <Button
+            startIcon={<EditIcon />}
+            variant="outlined"
+            onClick={handleEdit}
+            sx={{ mr: 1 }}
+          >
+            Edit
+          </Button>
+          <Button
+            startIcon={<DuplicateIcon />}
+            variant="outlined"
+            onClick={handleDuplicate}
+            sx={{ mr: 1 }}
+          >
+            Duplicate
+          </Button>
+          <Button
+            startIcon={<DeleteIcon />}
+            variant="outlined"
+            color="error"
+            onClick={handleDelete}
+          >
+            Delete
+          </Button>
         </Box>
       </Box>
 
-      {/* Main content */}
-      <Paper sx={{ p: 3, mb: 3 }}>
-        {isEditing ? (
-          <EditMaterialForm
-            material={material}
-            onSave={handleSave}
-            onCancel={handleCancel}
-          />
-        ) : (
-          <>
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs
-                value={tabValue}
-                onChange={handleTabChange}
-                aria-label="material tabs"
-              >
-                <Tab
-                  label="Details"
-                  id="material-tab-0"
-                  aria-controls="material-tabpanel-0"
-                />
-                <Tab
-                  label="Audit History"
-                  id="material-tab-1"
-                  aria-controls="material-tabpanel-1"
-                />
-              </Tabs>
+      {/* Tabs */}
+      <Paper sx={{ mb: 3 }}>
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          sx={{ borderBottom: 1, borderColor: "divider" }}
+        >
+          <Tab label="Details" />
+          <Tab label="Audit History" />
+        </Tabs>
+
+        {/* Tab Contents */}
+        <TabPanel value={tabValue} index={0}>
+          {isEditing ? (
+            <EditMaterialForm
+              material={material}
+              onSave={handleSave}
+              onCancel={handleCancel}
+            />
+          ) : (
+            <MaterialDetailView material={material} />
+          )}
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={1}>
+          {auditHistory.length === 0 ? (
+            <Typography>No audit history available</Typography>
+          ) : (
+            <Box>
+              {auditHistory.map((entry) => (
+                <Paper
+                  key={entry.id}
+                  sx={{ p: 2, mb: 2, display: "flex", alignItems: "center" }}
+                >
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="subtitle1">
+                      {entry.action} by {entry.userName}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {entry.details}
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" color="text.secondary">
+                    {typeof entry.timestamp === "string"
+                      ? new Date(entry.timestamp).toLocaleString()
+                      : entry.timestamp.toLocaleString()}
+                  </Typography>
+                </Paper>
+              ))}
             </Box>
-
-            <TabPanel value={tabValue} index={0}>
-              <MaterialDetailView material={material} />
-            </TabPanel>
-
-            <TabPanel value={tabValue} index={1}>
-              <Typography variant="h6" gutterBottom>
-                Audit History
-              </Typography>
-              <Box sx={{ mt: 2 }}>
-                {mockAuditHistory.map((entry) => (
-                  <Paper key={entry.id} sx={{ p: 2, mb: 2 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        mb: 1,
-                      }}
-                    >
-                      <Typography variant="subtitle1" fontWeight="medium">
-                        {entry.action.charAt(0).toUpperCase() +
-                          entry.action.slice(1)}{" "}
-                        by {entry.user}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {entry.timestamp.toLocaleString()}
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2">{entry.details}</Typography>
-                  </Paper>
-                ))}
-              </Box>
-            </TabPanel>
-          </>
-        )}
+          )}
+        </TabPanel>
       </Paper>
 
-      {/* Delete confirmation dialog */}
+      {/* Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        aria-labelledby="delete-dialog-title"
-        aria-describedby="delete-dialog-description"
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="delete-dialog-title">Delete Material</DialogTitle>
+        <DialogTitle id="alert-dialog-title">Confirm Delete</DialogTitle>
         <DialogContent>
-          <DialogContentText id="delete-dialog-description">
-            Are you sure you want to delete "{material.name}"? This action
-            cannot be undone.
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this material? This action cannot be
+            undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -329,13 +357,12 @@ const MaterialDetail = () => {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
+        onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
-          onClose={() => setSnackbarOpen(false)}
+          onClose={handleSnackbarClose}
           severity={snackbarSeverity}
-          variant="filled"
           sx={{ width: "100%" }}
         >
           {snackbarMessage}
