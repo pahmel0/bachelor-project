@@ -99,18 +99,6 @@
 			<scope>runtime</scope>
 		</dependency>
 		
-		<!-- Apache Derby Database -->
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<version>10.17.1.0</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derbyclient</artifactId>
-			<scope>runtime</scope>
-		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
