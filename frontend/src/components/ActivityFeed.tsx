@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   List,
   ListItem,
@@ -7,7 +8,7 @@ import {
   Typography,
   Divider,
   Box,
-  Chip,
+  CircularProgress,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -16,64 +17,20 @@ import {
   Visibility as ViewIcon,
 } from "@mui/icons-material";
 import { format } from "date-fns";
-
-// Mock data for recent activity
-const recentActivities = [
-  {
-    id: 1,
-    action: "added",
-    user: "John Doe",
-    item: "Wooden Chair",
-    material: "Wood",
-    condition: "Reusable",
-    timestamp: new Date(2023, 5, 15, 9, 30),
-  },
-  {
-    id: 2,
-    action: "edited",
-    user: "Jane Smith",
-    item: "Metal Frame",
-    material: "Steel",
-    condition: "Repairable",
-    timestamp: new Date(2023, 5, 14, 14, 45),
-  },
-  {
-    id: 3,
-    action: "deleted",
-    user: "Mike Johnson",
-    item: "Plastic Container",
-    material: "Plastic",
-    condition: "Damaged",
-    timestamp: new Date(2023, 5, 14, 11, 20),
-  },
-  {
-    id: 4,
-    action: "viewed",
-    user: "Sarah Williams",
-    item: "Glass Bottle",
-    material: "Glass",
-    condition: "Reusable",
-    timestamp: new Date(2023, 5, 13, 16, 10),
-  },
-  {
-    id: 5,
-    action: "added",
-    user: "David Brown",
-    item: "Fabric Scraps",
-    material: "Textile",
-    condition: "Reusable",
-    timestamp: new Date(2023, 5, 13, 10, 5),
-  },
-];
+import { Activity } from "../types/material";
+import materialService from "../services/materialService";
 
 // Helper function to get icon based on action
 const getActionIcon = (action: string) => {
-  switch (action) {
+  switch (action.toLowerCase()) {
     case "added":
+    case "created":
       return <AddIcon />;
     case "edited":
+    case "updated":
       return <EditIcon />;
     case "deleted":
+    case "removed":
       return <DeleteIcon />;
     case "viewed":
       return <ViewIcon />;
@@ -84,12 +41,15 @@ const getActionIcon = (action: string) => {
 
 // Helper function to get color based on action
 const getActionColor = (action: string) => {
-  switch (action) {
+  switch (action.toLowerCase()) {
     case "added":
+    case "created":
       return "#4caf50";
     case "edited":
+    case "updated":
       return "#2196f3";
     case "deleted":
+    case "removed":
       return "#f44336";
     case "viewed":
       return "#9e9e9e";
@@ -98,24 +58,64 @@ const getActionColor = (action: string) => {
   }
 };
 
-// Helper function to get condition color
-const getConditionColor = (condition: string) => {
-  switch (condition) {
-    case "Reusable":
-      return "#4caf50";
-    case "Repairable":
-      return "#ff9800";
-    case "Damaged":
-      return "#f44336";
-    default:
-      return "#9e9e9e";
+// Helper function to format date
+const formatDate = (dateValue: Date | string): string => {
+  if (typeof dateValue === "string") {
+    return format(new Date(dateValue), "MMM d, yyyy h:mm a");
   }
+  return format(dateValue, "MMM d, yyyy h:mm a");
 };
 
 const ActivityFeed = () => {
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        setLoading(true);
+        const data = await materialService.getRecentActivity();
+        setActivities(data);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch activities:", err);
+        setError("Failed to load recent activities");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActivities();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+        <CircularProgress size={30} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
+
+  if (activities.length === 0) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Typography>No recent activity found</Typography>
+      </Box>
+    );
+  }
+
   return (
     <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-      {recentActivities.map((activity, index) => (
+      {activities.map((activity, index) => (
         <Box key={activity.id}>
           {index > 0 && <Divider variant="inset" component="li" />}
           <ListItem alignItems="flex-start">
@@ -131,9 +131,9 @@ const ActivityFeed = () => {
                   variant="body1"
                   fontWeight="medium"
                 >
-                  {activity.user}{" "}
+                  {activity.userName}{" "}
                   <Typography component="span" color="text.secondary">
-                    {activity.action} {activity.item}
+                    {activity.action} {activity.materialName}
                   </Typography>
                 </Typography>
               }
@@ -147,29 +147,18 @@ const ActivityFeed = () => {
                       gap: 1,
                     }}
                   >
-                    <Chip
-                      label={activity.material}
-                      size="small"
-                      variant="outlined"
-                    />
-                    <Chip
-                      label={activity.condition}
-                      size="small"
-                      sx={{
-                        backgroundColor: `${getConditionColor(
-                          activity.condition
-                        )}20`,
-                        color: getConditionColor(activity.condition),
-                        borderColor: getConditionColor(activity.condition),
-                      }}
-                    />
+                    {activity.details && (
+                      <Typography variant="body2" color="text.secondary">
+                        {activity.details}
+                      </Typography>
+                    )}
                     <Typography
                       component="span"
                       variant="body2"
                       color="text.secondary"
                       sx={{ ml: "auto" }}
                     >
-                      {format(activity.timestamp, "MMM d, yyyy h:mm a")}
+                      {formatDate(activity.timestamp)}
                     </Typography>
                   </Box>
                 </>
