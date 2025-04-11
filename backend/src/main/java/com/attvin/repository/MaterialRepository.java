@@ -13,7 +13,7 @@ public interface MaterialRepository extends JpaRepository<MaterialRecord, Long> 
     
     @Query("SELECT m FROM MaterialRecord m WHERE " +
            "(:category IS NULL OR m.category = :category) AND " +
-           "(:type IS NULL OR m.materialType = :type) AND " +
+           "(:type IS NULL OR TYPE(m) = :type) AND " +
            "(:condition IS NULL OR m.condition = :condition) AND " +
            "(:query IS NULL OR " +
            "LOWER(m.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
