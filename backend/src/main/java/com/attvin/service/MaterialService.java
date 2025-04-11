@@ -1,6 +1,7 @@
 package com.attvin.service;
 
 import com.attvin.dto.MaterialRecordDTO;
+import com.attvin.dto.MaterialStatsDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,9 @@ public interface MaterialService {
     
     // Search and filter operations
     Page<MaterialRecordDTO> searchMaterials(String category, String type, String condition, String query, Pageable pageable);
+    
+    // Statistics
+    MaterialStatsDTO getMaterialStats();
     
     // Import/Export operations
     void importMaterialsFromCsv(MultipartFile csvFile);
