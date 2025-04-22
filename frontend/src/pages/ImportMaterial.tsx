@@ -18,18 +18,64 @@ import { useNavigate } from "react-router-dom";
 
 const steps = ["Upload Image", "Enter Details", "Review & Submit"];
 
+// Helper function to get the display label for a material type
+const objectTypeLabel = (materialType: string): string => {
+  const typeMap: Record<string, string> = {
+    DESK: "Desk",
+    DOOR: "Door",
+    WINDOW: "Window",
+    OFFICE_CABINET: "Office Cabinet",
+    DRAWER_UNIT: "Drawer Unit",
+  };
+  return typeMap[materialType] || materialType;
+};
+
 const ImportMaterial = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<MaterialFormData>({
     name: "",
-    objectType: "",
-    material: "",
+    materialType: "",
+    category: "",
     condition: "",
-    dimensions: "",
     notes: "",
+    color: "",
   });
+
+  // Helper function to display type-specific details in the review step
+  const getTypeSpecificDetails = (): string => {
+    if (!formData.materialType) return "";
+
+    switch (formData.materialType) {
+      case "DESK":
+        return `Desk Type: ${formData.deskType || "Not specified"}
+${
+  formData.heightAdjustable ? "Height Adjustable: Yes" : "Height Adjustable: No"
+}
+${
+  formData.maximumHeight ? `Maximum Height: ${formData.maximumHeight} cm` : ""
+}`;
+
+      case "WINDOW":
+        return `Opening Type: ${formData.openingType || "Not specified"}
+${formData.hingeSide ? `Hinge Side: ${formData.hingeSide}` : ""}
+${formData.uValue ? `U-Value: ${formData.uValue}` : ""}`;
+
+      case "DOOR":
+        return `Swing Direction: ${formData.swingDirection || "Not specified"}
+${formData.uValue ? `U-Value: ${formData.uValue}` : ""}`;
+
+      case "OFFICE_CABINET":
+        return `Opening Type: ${formData.openingType || "Not specified"}`;
+
+      case "DRAWER_UNIT":
+        return `Has Wheels: ${formData.hasWheels ? "Yes" : "No"}`;
+
+      default:
+        return "No specific details available";
+    }
+  };
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -70,12 +116,37 @@ const ImportMaterial = () => {
     }
 
     if (activeStep === 1) {
-      return !!(
+      // Basic validation for required fields
+      const basicFieldsValid = !!(
         formData.name.trim() &&
-        formData.objectType &&
-        formData.material &&
-        formData.condition
+        formData.materialType &&
+        formData.category &&
+        formData.condition &&
+        formData.color
       );
+
+      if (!basicFieldsValid) return false;
+
+      // Check dimensions
+      if (!formData.width || !formData.height) {
+        return false;
+      }
+
+      // Type-specific validation
+      switch (formData.materialType) {
+        case "DESK":
+          return !!formData.deskType && !!formData.depth;
+        case "WINDOW":
+          return !!formData.openingType && !!formData.depth;
+        case "DOOR":
+          return !!formData.swingDirection && !!formData.depth;
+        case "OFFICE_CABINET":
+          return !!formData.openingType && !!formData.depth;
+        case "DRAWER_UNIT":
+          return !!formData.depth;
+        default:
+          return true;
+      }
     }
 
     return true;
@@ -189,19 +260,21 @@ const ImportMaterial = () => {
                   <Grid container spacing={2} sx={{ mb: 2 }}>
                     <Grid item xs={4}>
                       <Typography variant="body2" color="text.secondary">
-                        Object Type
+                        Material Type
                       </Typography>
                       <Typography variant="body1">
-                        {formData.objectType}
+                        {formData.materialType
+                          ? objectTypeLabel(formData.materialType)
+                          : ""}
                       </Typography>
                     </Grid>
 
                     <Grid item xs={4}>
                       <Typography variant="body2" color="text.secondary">
-                        Material
+                        Category
                       </Typography>
                       <Typography variant="body1">
-                        {formData.material}
+                        {formData.category}
                       </Typography>
                     </Grid>
 
@@ -217,12 +290,40 @@ const ImportMaterial = () => {
 
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary">
+                      Color
+                    </Typography>
+                    <Typography variant="body1">{formData.color}</Typography>
+                  </Box>
+
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
                       Dimensions
                     </Typography>
                     <Typography variant="body1">
-                      {formData.dimensions || "Not specified"}
+                      {formData.width && formData.height
+                        ? `Width: ${formData.width} cm × Height: ${
+                            formData.height
+                          } cm${
+                            formData.depth
+                              ? ` × Depth: ${formData.depth} cm`
+                              : ""
+                          }`
+                        : "Not specified"}
                     </Typography>
                   </Box>
+
+                  {/* Type-specific details */}
+                  {formData.materialType && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {objectTypeLabel(formData.materialType)} Specific
+                        Details
+                      </Typography>
+                      <Typography variant="body1">
+                        {getTypeSpecificDetails()}
+                      </Typography>
+                    </Box>
+                  )}
 
                   <Box>
                     <Typography variant="body2" color="text.secondary">
