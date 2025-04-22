@@ -35,8 +35,7 @@ public class AuditTrail {
     public enum ActionType {
         CREATED,
         UPDATED,
-        DELETED,
-        VIEWED
+        DELETED
     }
     
     // Getters and setters

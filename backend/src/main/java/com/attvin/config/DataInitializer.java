@@ -210,11 +210,11 @@ public class DataInitializer {
             creationEntry.setUserName(admin.getName());
             auditTrailRepository.save(creationEntry);
             
-            // View entry (regular user)
+            // Update entry (regular user)
             AuditTrail viewEntry = new AuditTrail();
             viewEntry.setMaterial(material);
-            viewEntry.setAction(AuditTrail.ActionType.VIEWED);
-            viewEntry.setDetails("Material details were viewed");
+            viewEntry.setAction(AuditTrail.ActionType.UPDATED);
+            viewEntry.setDetails("Material details were updated");
             viewEntry.setTimestamp(now.minusDays(2));
             viewEntry.setUserId(regularUser.getId());
             viewEntry.setUserName(regularUser.getName());

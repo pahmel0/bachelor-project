@@ -14,7 +14,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Visibility as ViewIcon,
 } from "@mui/icons-material";
 import { format } from "date-fns";
 import { Activity } from "../types/material";
@@ -32,8 +31,6 @@ const getActionIcon = (action: string) => {
     case "deleted":
     case "removed":
       return <DeleteIcon />;
-    case "viewed":
-      return <ViewIcon />;
     default:
       return <AddIcon />;
   }
@@ -51,8 +48,6 @@ const getActionColor = (action: string) => {
     case "deleted":
     case "removed":
       return "#f44336";
-    case "viewed":
-      return "#9e9e9e";
     default:
       return "#4caf50";
   }
