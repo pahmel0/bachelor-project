@@ -68,13 +68,21 @@ const EditMaterialForm: React.FC<EditMaterialFormProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    // Handle numeric inputs
+    if (["width", "height", "depth"].includes(name)) {
+      setFormData({
+        ...formData,
+        [name]: value === "" ? undefined : Number(value),
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
 
     // Validate required fields
-    if (["name", "dimensions"].includes(name)) {
+    if (["name", "width", "height"].includes(name)) {
       const error = validateField(name, value as string);
       setErrors({
         ...errors,
@@ -92,7 +100,7 @@ const EditMaterialForm: React.FC<EditMaterialFormProps> = ({
     });
 
     // Validate required fields
-    if (["objectType", "material", "condition"].includes(name)) {
+    if (["category", "materialType", "condition"].includes(name)) {
       const error = validateField(name, value as string);
       setErrors({
         ...errors,
@@ -108,18 +116,23 @@ const EditMaterialForm: React.FC<EditMaterialFormProps> = ({
     const newErrors: Record<string, string> = {};
     let hasErrors = false;
 
-    ["name", "objectType", "material", "condition", "dimensions"].forEach(
-      (field) => {
-        const error = validateField(
-          field,
-          formData[field as keyof Material] as string
-        );
-        if (error) {
-          newErrors[field] = error;
-          hasErrors = true;
-        }
+    [
+      "name",
+      "category",
+      "materialType",
+      "condition",
+      "width",
+      "height",
+    ].forEach((field) => {
+      const error = validateField(
+        field,
+        String(formData[field as keyof Material] || "")
+      );
+      if (error) {
+        newErrors[field] = error;
+        hasErrors = true;
       }
-    );
+    });
 
     if (hasErrors) {
       setErrors(newErrors);
@@ -151,12 +164,12 @@ const EditMaterialForm: React.FC<EditMaterialFormProps> = ({
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <FormControl fullWidth required error={!!errors.objectType}>
+          <FormControl fullWidth required error={!!errors.category}>
             <InputLabel id="object-type-label">Object Type</InputLabel>
             <Select
               labelId="object-type-label"
-              name="objectType"
-              value={formData.objectType}
+              name="category"
+              value={formData.category || ""}
               label="Object Type"
               onChange={handleSelectChange}
             >
@@ -166,19 +179,19 @@ const EditMaterialForm: React.FC<EditMaterialFormProps> = ({
                 </MenuItem>
               ))}
             </Select>
-            {errors.objectType && (
-              <FormHelperText>{errors.objectType}</FormHelperText>
+            {errors.category && (
+              <FormHelperText>{errors.category}</FormHelperText>
             )}
           </FormControl>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <FormControl fullWidth required error={!!errors.material}>
+          <FormControl fullWidth required error={!!errors.materialType}>
             <InputLabel id="material-type-label">Material Type</InputLabel>
             <Select
               labelId="material-type-label"
-              name="material"
-              value={formData.material}
+              name="materialType"
+              value={formData.materialType || ""}
               label="Material Type"
               onChange={handleSelectChange}
             >
@@ -188,8 +201,8 @@ const EditMaterialForm: React.FC<EditMaterialFormProps> = ({
                 </MenuItem>
               ))}
             </Select>
-            {errors.material && (
-              <FormHelperText>{errors.material}</FormHelperText>
+            {errors.materialType && (
+              <FormHelperText>{errors.materialType}</FormHelperText>
             )}
           </FormControl>
         </Grid>
@@ -216,18 +229,42 @@ const EditMaterialForm: React.FC<EditMaterialFormProps> = ({
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={4}>
           <TextField
             required
             fullWidth
-            label="Dimensions"
-            name="dimensions"
-            value={formData.dimensions}
+            label="Width (cm)"
+            name="width"
+            type="number"
+            value={formData.width || ""}
             onChange={handleInputChange}
-            error={!!errors.dimensions}
-            helperText={
-              errors.dimensions || "Format: Width x Depth x Height (cm)"
-            }
+            error={!!errors.width}
+            helperText={errors.width || ""}
+          />
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <TextField
+            required
+            fullWidth
+            label="Height (cm)"
+            name="height"
+            type="number"
+            value={formData.height || ""}
+            onChange={handleInputChange}
+            error={!!errors.height}
+            helperText={errors.height || ""}
+          />
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <TextField
+            fullWidth
+            label="Depth (cm)"
+            name="depth"
+            type="number"
+            value={formData.depth || ""}
+            onChange={handleInputChange}
+            error={!!errors.depth}
+            helperText={errors.depth || "Optional"}
           />
         </Grid>
 
