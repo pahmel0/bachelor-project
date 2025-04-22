@@ -73,4 +73,17 @@ public class User {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
-} 
+
+    // No-args constructor
+    public User() {
+        // Required by JPA
+    }
+
+    // All-args constructor
+    public User(String email, String passwordHash, String name, Set<Role> roles) {
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.name = name;
+        this.roles = roles;
+    }
+}

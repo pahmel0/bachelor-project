@@ -1,5 +1,7 @@
 package com.attvin.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -69,4 +71,21 @@ public class Desk extends MaterialRecord {
     public void setDepth(Double depth) {
         this.depth = depth;
     }
-} 
+
+    // No-args constructor
+    public Desk() {
+        // Required by JPA
+    }
+
+    // All-args constructor
+    public Desk(String name, String category, LocalDateTime dateAdded, String condition, 
+                String notes, String color, DeskType deskType, Boolean heightAdjustable, 
+                Double maximumHeight, Double width, Double depth) {
+        super(name, category, dateAdded, condition, notes, color);
+        this.deskType = deskType;
+        this.heightAdjustable = heightAdjustable;
+        this.maximumHeight = maximumHeight;
+        this.width = width;
+        this.depth = depth;
+    }
+}

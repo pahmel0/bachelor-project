@@ -94,4 +94,21 @@ public class AuditTrail {
     public void setUserName(String userName) {
         this.userName = userName;
     }
-} 
+
+    // No-args constructor
+    public AuditTrail() {
+        // Required by JPA
+    }
+
+    // All-args constructor
+    public AuditTrail(MaterialRecord material, ActionType action, String details, 
+                      LocalDateTime timestamp, Long userId, String userName) {
+        this.material = material;
+        this.action = action;
+        this.details = details;
+        this.timestamp = timestamp;
+        this.userId = userId;
+        this.userName = userName;
+    }
+}
+

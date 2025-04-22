@@ -1,5 +1,7 @@
 package com.attvin.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -81,4 +83,21 @@ public class Window extends MaterialRecord {
     public void setUValue(Double uValue) {
         this.uValue = uValue;
     }
-} 
+
+    // No-args constructor
+    public Window() {
+        // Required by JPA
+    }
+
+    // All-args constructor
+    public Window(String name, String category, LocalDateTime dateAdded, String condition, 
+                 String notes, String color, Double height, Double width, 
+                 OpeningType openingType, HingeSide hingeSide, Double uValue) {
+        super(name, category, dateAdded, condition, notes, color);
+        this.height = height;
+        this.width = width;
+        this.openingType = openingType;
+        this.hingeSide = hingeSide;
+        this.uValue = uValue;
+    }
+}

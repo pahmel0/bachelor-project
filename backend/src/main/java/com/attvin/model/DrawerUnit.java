@@ -1,5 +1,7 @@
 package com.attvin.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -51,4 +53,21 @@ public class DrawerUnit extends MaterialRecord {
     public void setHasWheels(Boolean hasWheels) {
         this.hasWheels = hasWheels;
     }
-} 
+
+    // No-args constructor
+    public DrawerUnit() {
+        // Required by JPA
+    }
+
+    // All-args constructor
+    public DrawerUnit(String name, String category, LocalDateTime dateAdded, 
+                     String condition, String notes, String color, Double height, 
+                     Double width, Double depth, Boolean hasWheels) {
+        super(name, category, dateAdded, condition, notes, color);
+        this.height = height;
+        this.width = width;
+        this.depth = depth;
+        this.hasWheels = hasWheels;
+    }
+}
+

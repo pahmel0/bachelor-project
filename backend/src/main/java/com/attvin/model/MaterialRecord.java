@@ -117,4 +117,20 @@ public abstract class MaterialRecord {
     public void setPictures(List<MaterialPicture> pictures) {
         this.pictures = pictures;
     }
-} 
+
+    // No-args constructor
+    protected MaterialRecord() {
+        // Required by JPA
+    }
+
+    // All-args constructor
+    protected MaterialRecord(String name, String category, LocalDateTime dateAdded, 
+                           String condition, String notes, String color) {
+        this.name = name;
+        this.category = category;
+        this.dateAdded = dateAdded;
+        this.condition = condition;
+        this.notes = notes;
+        this.color = color;
+    }
+}

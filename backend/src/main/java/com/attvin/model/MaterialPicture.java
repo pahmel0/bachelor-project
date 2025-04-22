@@ -109,4 +109,24 @@ public class MaterialPicture {
     public void setDescription(String description) {
         this.description = description;
     }
-} 
+
+    // No-args constructor
+    public MaterialPicture() {
+        // Required by JPA
+    }
+
+    // All-args constructor
+    public MaterialPicture(MaterialRecord material, byte[] pictureData, 
+                         LocalDateTime uploadDate, Boolean isPrimary, String fileName, 
+                         Long fileSize, String contentType, String description) {
+        this.material = material;
+        this.pictureData = pictureData;
+        this.uploadDate = uploadDate;
+        this.isPrimary = isPrimary;
+        this.fileName = fileName;
+        this.fileSize = fileSize;
+        this.contentType = contentType;
+        this.description = description;
+    }
+}
+ 

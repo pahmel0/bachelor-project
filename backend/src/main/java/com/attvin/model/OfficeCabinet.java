@@ -1,5 +1,7 @@
 package com.attvin.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -59,4 +61,21 @@ public class OfficeCabinet extends MaterialRecord {
     public void setOpeningType(OpeningType openingType) {
         this.openingType = openingType;
     }
-} 
+
+    // No-args constructor
+    public OfficeCabinet() {
+        // Required by JPA
+    }
+
+    // All-args constructor
+    public OfficeCabinet(String name, String category, LocalDateTime dateAdded, 
+                        String condition, String notes, String color, Double height, 
+                        Double width, Double depth, OpeningType openingType) {
+        super(name, category, dateAdded, condition, notes, color);
+        this.height = height;
+        this.width = width;
+        this.depth = depth;
+        this.openingType = openingType;
+    }
+}
+ 
