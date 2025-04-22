@@ -72,7 +72,14 @@ const MaterialsGrid: React.FC<MaterialsGridProps> = ({ materials }) => {
                 <CardMedia
                   component="img"
                   height="140"
-                  image={material.imageUrl || "/placeholder-image.png"}
+                  image={
+                    material.pictures && material.pictures.length > 0
+                      ? `/api/materials/pictures/${
+                          material.pictures.find((p) => p.isPrimary)?.id ||
+                          material.pictures[0].id
+                        }`
+                      : "/placeholder-image.png"
+                  }
                   alt={material.name}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -88,20 +95,25 @@ const MaterialsGrid: React.FC<MaterialsGridProps> = ({ materials }) => {
                     sx={{ mb: 1, display: "flex", gap: 0.5, flexWrap: "wrap" }}
                   >
                     <Chip
-                      label={material.objectType}
+                      label={material.category}
                       size="small"
                       color="primary"
                       variant="outlined"
                     />
                     <Chip
-                      label={material.material}
+                      label={material.materialType}
                       size="small"
                       color="secondary"
                       variant="outlined"
                     />
                   </Box>
                   <Typography variant="body2" color="text.secondary">
-                    Dimensions: {material.dimensions || "Not specified"}
+                    Dimensions:{" "}
+                    {material.height && material.width
+                      ? `${material.height} × ${material.width}${
+                          material.depth ? ` × ${material.depth}` : ""
+                        } cm`
+                      : "Not specified"}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Added: {formatDate(material.dateAdded)}

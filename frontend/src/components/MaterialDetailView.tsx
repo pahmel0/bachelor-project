@@ -29,7 +29,7 @@ const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              backgroundImage: `url(${material.imageUrl})`,
+              backgroundImage: `url(${material.pictures?.[0]?.fileName})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
@@ -49,8 +49,8 @@ const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
                 mb: 2,
               }}
             >
-              <Chip label={material.objectType} color="primary" />
-              <Chip label={material.material} color="secondary" />
+              <Chip label={material.category} color="primary" />
+              <Chip label={material.materialType} color="secondary" />
               <Chip
                 label={material.condition}
                 color={
@@ -63,7 +63,7 @@ const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
               />
             </Box>
             <Typography variant="body1" gutterBottom>
-              <strong>Dimensions:</strong> {material.dimensions}
+              <strong>Dimensions:</strong> {material.height} cm x {material.width} cm x {material.depth} cm
             </Typography>
             <Typography
               variant="caption"

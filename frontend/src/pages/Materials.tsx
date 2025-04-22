@@ -32,11 +32,28 @@ const Materials = () => {
         const data = await materialService.getAllMaterials();
         console.log("Fetched materials:", data);
 
-        if (!data || !Array.isArray(data)) {
+        if (!data) {
+          console.error("No data received from server", data);
+          setError("No data received from server");
+          setMaterials([]);
+          setFilteredMaterials([]);
+          return;
+        }
+
+        if (!Array.isArray(data)) {
           console.error("Invalid materials data format:", data);
           setError("Invalid data format received from server");
           setMaterials([]);
           setFilteredMaterials([]);
+          return;
+        }
+
+        // Valid empty array is fine - just means no materials yet
+        if (data.length === 0) {
+          console.log("No materials found in the database");
+          setMaterials([]);
+          setFilteredMaterials([]);
+          setError(null);
           return;
         }
 
@@ -66,8 +83,8 @@ const Materials = () => {
       result = result.filter(
         (material) =>
           (material.name?.toLowerCase() || "").includes(query) ||
-          (material.objectType?.toLowerCase() || "").includes(query) ||
-          (material.material?.toLowerCase() || "").includes(query) ||
+          (material.category?.toLowerCase() || "").includes(query) ||
+          (material.materialType?.toLowerCase() || "").includes(query) ||
           (material.condition?.toLowerCase() || "").includes(query)
       );
     }
@@ -75,16 +92,16 @@ const Materials = () => {
     // Apply category filters
     if (filters.objectTypes.length > 0) {
       result = result.filter((material) =>
-        material.objectType
-          ? filters.objectTypes.includes(material.objectType)
+        material.category
+          ? filters.objectTypes.includes(material.category)
           : false
       );
     }
 
     if (filters.materialTypes.length > 0) {
       result = result.filter((material) =>
-        material.material
-          ? filters.materialTypes.includes(material.material)
+        material.materialType
+          ? filters.materialTypes.includes(material.materialType)
           : false
       );
     }
@@ -145,10 +162,17 @@ const Materials = () => {
         <Box sx={{ p: 3, textAlign: "center" }}>
           <Typography variant="h6">Error loading materials data</Typography>
         </Box>
+      ) : filteredMaterials.length === 0 && materials.length === 0 ? (
+        <Box sx={{ p: 3, textAlign: "center" }}>
+          <Typography variant="h6">
+            No materials found in the database. Add some materials to get
+            started!
+          </Typography>
+        </Box>
       ) : filteredMaterials.length === 0 ? (
         <Box sx={{ p: 3, textAlign: "center" }}>
           <Typography variant="h6">
-            No materials found matching your criteria
+            No materials found matching your search criteria
           </Typography>
         </Box>
       ) : (
