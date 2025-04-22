@@ -4,14 +4,37 @@
 export interface Material {
   id: number;
   name: string;
-  imageUrl: string;
-  objectType: string;
-  material: string;
+  category: string; // Maps to objectType in UI
+  materialType: string; // Maps to material in UI
   condition: string;
   dateAdded: Date | string;
-  dimensions: string;
   notes?: string;
   color?: string;
+  pictures?: MaterialPicture[];
+  // Dimensions-related fields
+  height?: number;
+  width?: number;
+  depth?: number;
+  // Additional fields that might be present
+  uValue?: number;
+  openingType?: string;
+  hingeSide?: string;
+  swingDirection?: string;
+  heightAdjustable?: boolean;
+  hasWheels?: boolean;
+}
+
+/**
+ * Interface for Material Picture data
+ */
+export interface MaterialPicture {
+  id: number;
+  fileName: string;
+  contentType: string;
+  fileSize: number;
+  uploadDate: Date | string;
+  isPrimary: boolean;
+  description?: string;
 }
 
 /**
