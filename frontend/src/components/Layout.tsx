@@ -19,7 +19,6 @@ const Layout = ({ children }: LayoutProps) => {
           flexGrow: 1,
           p: 3,
           width: { sm: `calc(100% - 240px)` },
-          ml: { sm: "240px" },
           mt: "64px",
           backgroundColor: "background.default",
         }}
