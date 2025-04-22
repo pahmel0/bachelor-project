@@ -56,8 +56,8 @@ const Header = () => {
     <AppBar
       position="fixed"
       sx={{
-        width: { sm: `calc(100% - 240px)` },
-        ml: { sm: "240px" },
+        width: "100%",
+        zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
       <Toolbar>
