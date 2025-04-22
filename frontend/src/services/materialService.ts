@@ -8,7 +8,21 @@ const materialService = {
   getAllMaterials: async (): Promise<Material[]> => {
     try {
       const response = await api.get("/materials");
-      return response.data;
+      // Handle paginated response from Spring Data
+      if (
+        response.data &&
+        response.data.content &&
+        Array.isArray(response.data.content)
+      ) {
+        console.log("Received paginated response, extracting content array");
+        return response.data.content;
+      }
+      // Fallback to the entire response if it's an array
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      console.error("Unexpected data format:", response.data);
+      return [];
     } catch (error) {
       console.error("Error fetching materials:", error);
       throw error;
@@ -88,7 +102,20 @@ const materialService = {
   getRecentActivity: async (): Promise<Activity[]> => {
     try {
       const response = await api.get("/audit-trail");
-      return response.data;
+      // Handle paginated response if applicable
+      if (
+        response.data &&
+        response.data.content &&
+        Array.isArray(response.data.content)
+      ) {
+        return response.data.content;
+      }
+      // Fallback to the entire response if it's an array
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      console.error("Unexpected activity data format:", response.data);
+      return [];
     } catch (error) {
       console.error("Error fetching recent activity:", error);
       throw error;
