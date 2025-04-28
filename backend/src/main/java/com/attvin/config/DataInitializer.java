@@ -98,7 +98,7 @@ public class DataInitializer {
         desk.setName("Corner Office Desk");
         desk.setCategory("Furniture");
         desk.setDateAdded(LocalDateTime.now().minusDays(5));
-        desk.setCondition("Reusable");
+        desk.setMaterialCondition("Reusable");
         desk.setColor("Oak");
         desk.setNotes("Slightly scratched on the right side, otherwise in good condition");
         desk.setDeskType(Desk.DeskType.CORNER_DESK);
@@ -112,7 +112,7 @@ public class DataInitializer {
         straightDesk.setName("Straight Office Desk");
         straightDesk.setCategory("Furniture");
         straightDesk.setDateAdded(LocalDateTime.now().minusDays(10));
-        straightDesk.setCondition("Repairable");
+        straightDesk.setMaterialCondition("Repairable");
         straightDesk.setColor("White");
         straightDesk.setNotes("Needs new table top");
         straightDesk.setDeskType(Desk.DeskType.STRAIGHT_DESK);
@@ -126,7 +126,7 @@ public class DataInitializer {
         window.setName("Double Glazed Window");
         window.setCategory("Windows");
         window.setDateAdded(LocalDateTime.now().minusDays(15));
-        window.setCondition("Reusable");
+        window.setMaterialCondition("Reusable");
         window.setColor("White");
         window.setNotes("Complete with frame and hardware");
         window.setWidth(120.0);
@@ -140,7 +140,7 @@ public class DataInitializer {
         door.setName("Wooden Interior Door");
         door.setCategory("Doors");
         door.setDateAdded(LocalDateTime.now().minusDays(20));
-        door.setCondition("Damaged");
+        door.setMaterialCondition("Damaged");
         door.setColor("Brown");
         door.setNotes("Has a broken handle that needs replacement");
         door.setWidth(90.0);
@@ -153,7 +153,7 @@ public class DataInitializer {
         cabinet.setName("File Storage Cabinet");
         cabinet.setCategory("Storage");
         cabinet.setDateAdded(LocalDateTime.now().minusDays(3));
-        cabinet.setCondition("Reusable");
+        cabinet.setMaterialCondition("Reusable");
         cabinet.setColor("Gray");
         cabinet.setNotes("Lockable with 2 keys included");
         cabinet.setWidth(80.0);

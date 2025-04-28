@@ -14,7 +14,7 @@ public interface MaterialRepository extends JpaRepository<MaterialRecord, Long> 
     @Query("SELECT m FROM MaterialRecord m WHERE " +
            "(:category IS NULL OR m.category = :category) AND " +
            "(:type IS NULL OR TYPE(m) = :type) AND " +
-           "(:condition IS NULL OR m.condition = :condition) AND " +
+           "(:condition IS NULL OR m.materialCondition = :condition) AND " +
            "(:query IS NULL OR " +
            "LOWER(m.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(m.notes) LIKE LOWER(CONCAT('%', :query, '%')))")
@@ -24,4 +24,4 @@ public interface MaterialRepository extends JpaRepository<MaterialRecord, Long> 
             @Param("condition") String condition,
             @Param("query") String query,
             Pageable pageable);
-} 
+}

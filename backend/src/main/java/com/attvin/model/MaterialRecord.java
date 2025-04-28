@@ -23,8 +23,8 @@ public abstract class MaterialRecord {
     @Column(name = "date_added", nullable = false)
     private LocalDateTime dateAdded;
 
-    @Column(nullable = false)
-    private String condition;
+    @Column(name = "material_condition", nullable = false)
+    private String materialCondition;
 
     private String notes;
 
@@ -86,12 +86,12 @@ public abstract class MaterialRecord {
         this.dateAdded = dateAdded;
     }
 
-    public String getCondition() {
-        return condition;
+    public String getMaterialCondition() {
+        return materialCondition;
     }
 
-    public void setCondition(String condition) {
-        this.condition = condition;
+    public void setMaterialCondition(String materialCondition) {
+        this.materialCondition = materialCondition;
     }
 
     public String getNotes() {
@@ -125,11 +125,11 @@ public abstract class MaterialRecord {
 
     // All-args constructor
     protected MaterialRecord(String name, String category, LocalDateTime dateAdded, 
-                           String condition, String notes, String color) {
+                           String materialCondition, String notes, String color) {
         this.name = name;
         this.category = category;
         this.dateAdded = dateAdded;
-        this.condition = condition;
+        this.materialCondition = materialCondition;
         this.notes = notes;
         this.color = color;
     }

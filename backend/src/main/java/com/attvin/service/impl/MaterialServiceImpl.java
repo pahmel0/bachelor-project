@@ -36,7 +36,7 @@ public class MaterialServiceImpl implements MaterialService {
         // Count by condition
         Map<String, Long> conditionCounts = new HashMap<>();
         for (MaterialRecord material : allMaterials) {
-            String condition = material.getCondition();
+            String condition = material.getMaterialCondition();
             conditionCounts.put(condition, conditionCounts.getOrDefault(condition, 0L) + 1);
         }
         
