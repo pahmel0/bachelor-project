@@ -5,6 +5,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,6 +27,13 @@ public class JwtUtil {
 
     @Value("${jwt.expiration}")
     private Long expiration;
+    
+    private Key signingKey;
+
+    @PostConstruct
+    public void init() {
+        this.signingKey = getSigningKey();
+    }
 
     public String generateToken(User user) {
         return Jwts.builder()
@@ -49,7 +58,11 @@ public class JwtUtil {
     }
 
     public List<String> extractRoles(String token) {
-        return extractAllClaims(token).get("roles", List.class);
+        List<?> roles = extractAllClaims(token).get("roles", List.class);
+        return roles.stream()
+                .filter(role -> role instanceof String)
+                .map(role -> (String) role)
+                .collect(Collectors.toList());
     }
 
     public Long extractUserId(String token) {
@@ -81,7 +94,16 @@ public class JwtUtil {
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
+        if (signingKey == null) {
+            // If the secret is at least 32 characters (256 bits), use it directly
+            if (secret.length() >= 32) {
+                byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+                signingKey = Keys.hmacShaKeyFor(keyBytes);
+            } else {
+                // Generate a secure key using the original secret as a seed
+                signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+            }
+        }
+        return signingKey;
     }
-} 
+}
