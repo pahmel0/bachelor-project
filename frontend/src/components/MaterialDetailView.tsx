@@ -15,6 +15,22 @@ const formatDate = (dateValue: Date | string): string => {
   return format(dateValue, "MMM d, yyyy");
 };
 
+// Helper function to get fallback image based on material category
+const getFallbackImageByType = (category: string): string => {
+  // Use actual images from public folder based on material category
+  switch (category.toLowerCase()) {
+    case "furniture":
+      return "/desk.jpg";
+    case "building material":
+    case "fixture":
+      return "/door.jpg";
+    case "decoration":
+      return "/cabinet.jpg";
+    default:
+      return "/straight_desk.jpg"; // Default fallback image
+  }
+};
+
 const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
   material,
 }) => {
@@ -29,11 +45,29 @@ const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              backgroundImage: `url(${material.pictures?.[0]?.fileName})`,
+              backgroundImage: material.pictures?.[0]?.fileName
+                ? `url(${material.pictures[0].fileName})`
+                : `url(${getFallbackImageByType(
+                    material.category.toLowerCase()
+                  )})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
+              backgroundColor: "#f5f5f5",
+              position: "relative",
             }}
-          />
+          >
+            {!material.pictures?.[0]?.fileName && (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              ></Box>
+            )}
+          </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 2, height: "100%" }}>
@@ -63,7 +97,8 @@ const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
               />
             </Box>
             <Typography variant="body1" gutterBottom>
-              <strong>Dimensions:</strong> {material.height} cm x {material.width} cm x {material.depth} cm
+              <strong>Dimensions:</strong> {material.height} cm x{" "}
+              {material.width} cm x {material.depth} cm
             </Typography>
             <Typography
               variant="caption"
