@@ -111,7 +111,7 @@ public class MaterialServiceImpl implements MaterialService {
                     picture.setFileSize(pictureFile.getSize());
                     picture.setUploadDate(LocalDateTime.now());
                     picture.setIsPrimary(i == 0); // First picture is primary by default
-                    picture.setPictureData(null);
+                    picture.setPictureData(pictureFile.getBytes());
                     
                     // Associate with material
                     material.addPicture(picture);
