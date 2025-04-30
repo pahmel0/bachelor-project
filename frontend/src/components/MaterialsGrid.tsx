@@ -44,6 +44,22 @@ const MaterialsGrid: React.FC<MaterialsGridProps> = ({ materials }) => {
     }
   };
 
+  // Helper function to get fallback image based on material category
+  const getFallbackImageByType = (category: string): string => {
+    // Use actual images from public folder based on material category
+    switch (category.toLowerCase()) {
+      case "furniture":
+        return "/desk.jpg";
+      case "building material":
+      case "fixture":
+        return "/door.jpg";
+      case "decoration":
+        return "/cabinet.jpg";
+      default:
+        return "/straight_desk.jpg"; // Default fallback image
+    }
+  };
+
   return (
     <Grid container spacing={3}>
       {Array.isArray(materials) && materials.length > 0 ? (
@@ -72,19 +88,26 @@ const MaterialsGrid: React.FC<MaterialsGridProps> = ({ materials }) => {
                 <CardMedia
                   component="img"
                   height="140"
+                  sx={{
+                    backgroundColor: "#f5f5f5", // Add background color as fallback
+                    objectFit: "contain", // Better handling of different image ratios
+                  }}
                   image={
                     material.pictures && material.pictures.length > 0
                       ? `/api/materials/pictures/${
                           material.pictures.find((p) => p.isPrimary)?.id ||
                           material.pictures[0].id
                         }`
-                      : "/placeholder-image.png"
+                      : getFallbackImageByType(material.category.toLowerCase())
                   }
                   alt={material.name}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null; // prevent infinite loop
-                    target.src = "/placeholder-image.png";
+                    target.src = getFallbackImageByType(
+                      material.category.toLowerCase()
+                    ); // Use fallback based on material category
+                    console.log(`Failed to load image for ${material.name}`);
                   }}
                 />
                 <CardContent sx={{ flexGrow: 1 }}>
