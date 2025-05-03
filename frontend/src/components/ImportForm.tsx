@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 
-// Options for form select fields
+// Options for form select fields - aligned with SearchFilterBar.tsx
 const objectTypes = [
   { value: "DESK", label: "Desk" },
   { value: "DOOR", label: "Door" },
@@ -21,18 +21,10 @@ const objectTypes = [
   { value: "DRAWER_UNIT", label: "Drawer Unit" },
 ];
 
-const categoryOptions = [
-  "Furniture",
-  "Storage",
-  "Building Material",
-  "Decoration",
-  "Fixture",
-  "Other",
-];
+const categoryOptions = ["Furniture", "Windows", "Doors", "Storage"];
 
-// Material types are now part of the category field
-
-const conditions = ["New", "Like New", "Reusable", "Needs Repair", "For Parts"];
+// Conditions aligned with SearchFilterBar.tsx
+const conditions = ["Reusable", "Repairable", "Damaged"];
 
 // Desk specific options
 const deskTypeOptions = [
