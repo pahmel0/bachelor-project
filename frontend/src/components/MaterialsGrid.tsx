@@ -45,8 +45,27 @@ const MaterialsGrid: React.FC<MaterialsGridProps> = ({ materials }) => {
   };
 
   // Helper function to get fallback image based on material category
-  const getFallbackImageByType = (category: string): string => {
-    // Use actual images from public folder based on material category
+  const getFallbackImageByType = (
+    category: string,
+    materialType?: string
+  ): string => {
+    // First check by material type if available
+    if (materialType) {
+      switch (materialType.toUpperCase()) {
+        case "DESK":
+          return "/desk.jpg";
+        case "DOOR":
+          return "/door.jpg";
+        case "WINDOW":
+          return "/window.jpg";
+        case "OFFICE_CABINET":
+          return "/cabinet.jpg";
+        case "DRAWER_UNIT":
+          return "/drawerUnit.jpg";
+      }
+    }
+
+    // Fallback to category if no specific type match
     switch (category.toLowerCase()) {
       case "furniture":
         return "/desk.jpg";
@@ -54,7 +73,10 @@ const MaterialsGrid: React.FC<MaterialsGridProps> = ({ materials }) => {
       case "fixture":
         return "/door.jpg";
       case "decoration":
+      case "storage":
         return "/cabinet.jpg";
+      case "windows":
+        return "/window.jpg";
       default:
         return "/straight_desk.jpg"; // Default fallback image
     }
@@ -98,14 +120,18 @@ const MaterialsGrid: React.FC<MaterialsGridProps> = ({ materials }) => {
                           material.pictures.find((p) => p.isPrimary)?.id ||
                           material.pictures[0].id
                         }`
-                      : getFallbackImageByType(material.category.toLowerCase())
+                      : getFallbackImageByType(
+                          material.category.toLowerCase(),
+                          material.materialType
+                        )
                   }
                   alt={material.name}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null; // prevent infinite loop
                     target.src = getFallbackImageByType(
-                      material.category.toLowerCase()
+                      material.category.toLowerCase(),
+                      material.materialType
                     ); // Use fallback based on material category
                     console.log(`Failed to load image for ${material.name}`);
                   }}

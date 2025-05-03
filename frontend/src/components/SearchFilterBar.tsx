@@ -15,17 +15,8 @@ import {
   Close as CloseIcon,
 } from "@mui/icons-material";
 
-// Filter options
-const objectTypes = [
-  "Furniture",
-  "Electronics",
-  "Construction",
-  "Textile",
-  "Plastic",
-  "Metal",
-  "Glass",
-  "Other",
-];
+// Filter options - updating to match the actual backend values
+const objectTypes = ["OFFICE_CABINET", "DESK", "DOOR", "DRAWER_UNIT", "WINDOW"];
 const materialTypes = [
   "Wood",
   "Metal",
@@ -48,6 +39,18 @@ interface FilterState {
   materialTypes: string[];
   conditions: string[];
 }
+
+// Helper function to display object types in a readable format
+const formatObjectType = (type: string): string => {
+  switch (type) {
+    case "OFFICE_CABINET":
+      return "Office Cabinet";
+    case "DRAWER_UNIT":
+      return "Drawer Unit";
+    default:
+      return type.charAt(0) + type.slice(1).toLowerCase();
+  }
+};
 
 const SearchFilterBar = ({ onSearch, onFilter }: SearchFilterBarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -178,7 +181,7 @@ const SearchFilterBar = ({ onSearch, onFilter }: SearchFilterBarProps) => {
           {filters.objectTypes.map((filter) => (
             <Chip
               key={`object-${filter}`}
-              label={filter}
+              label={formatObjectType(filter)}
               onDelete={() => removeFilter("objectTypes", filter)}
               color="primary"
               variant="outlined"
@@ -228,7 +231,7 @@ const SearchFilterBar = ({ onSearch, onFilter }: SearchFilterBarProps) => {
             {objectTypes.map((type) => (
               <Chip
                 key={type}
-                label={type}
+                label={formatObjectType(type)}
                 onClick={() => toggleFilter("objectTypes", type)}
                 color={
                   filters.objectTypes.includes(type) ? "primary" : "default"

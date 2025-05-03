@@ -16,8 +16,27 @@ const formatDate = (dateValue: Date | string): string => {
 };
 
 // Helper function to get fallback image based on material category
-const getFallbackImageByType = (category: string): string => {
-  // Use actual images from public folder based on material category
+const getFallbackImageByType = (
+  category: string,
+  materialType?: string
+): string => {
+  // First check by material type if available
+  if (materialType) {
+    switch (materialType.toUpperCase()) {
+      case "DESK":
+        return "/desk.jpg";
+      case "DOOR":
+        return "/door.jpg";
+      case "WINDOW":
+        return "/window.jpg";
+      case "OFFICE_CABINET":
+        return "/cabinet.jpg";
+      case "DRAWER_UNIT":
+        return "/drawerUnit.jpg";
+    }
+  }
+
+  // Fallback to category if no specific type match
   switch (category.toLowerCase()) {
     case "furniture":
       return "/desk.jpg";
@@ -25,7 +44,10 @@ const getFallbackImageByType = (category: string): string => {
     case "fixture":
       return "/door.jpg";
     case "decoration":
+    case "storage":
       return "/cabinet.jpg";
+    case "windows":
+      return "/window.jpg";
     default:
       return "/straight_desk.jpg"; // Default fallback image
   }
@@ -48,7 +70,8 @@ const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
               backgroundImage: material.pictures?.[0]?.fileName
                 ? `url(${material.pictures[0].fileName})`
                 : `url(${getFallbackImageByType(
-                    material.category.toLowerCase()
+                    material.category.toLowerCase(),
+                    material.materialType
                   )})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
