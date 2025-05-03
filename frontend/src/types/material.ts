@@ -22,6 +22,9 @@ export interface Material {
   swingDirection?: string;
   heightAdjustable?: boolean;
   hasWheels?: boolean;
+  // Adding missing properties used in MaterialDetailView
+  deskType?: string;
+  maximumHeight?: number;
 }
 
 /**
