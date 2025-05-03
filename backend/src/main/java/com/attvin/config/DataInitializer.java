@@ -96,7 +96,7 @@ public class DataInitializer {
         // Create a desk
         Desk desk = new Desk();
         desk.setName("Corner Office Desk");
-        desk.setCategory("Furniture");
+        desk.setCategory("Desks");
         desk.setDateAdded(LocalDateTime.now().minusDays(5));
         desk.setMaterialCondition("Reusable");
         desk.setColor("Oak");
@@ -107,20 +107,19 @@ public class DataInitializer {
         desk.setWidth(160.0);
         desk.setDepth(80.0);
         
-        // Create another desk
-        Desk straightDesk = new Desk();
-        straightDesk.setName("Straight Office Desk");
-        straightDesk.setCategory("Furniture");
-        straightDesk.setDateAdded(LocalDateTime.now().minusDays(10));
-        straightDesk.setMaterialCondition("Repairable");
-        straightDesk.setColor("White");
-        straightDesk.setNotes("Needs new table top");
-        straightDesk.setDeskType(Desk.DeskType.STRAIGHT_DESK);
-        straightDesk.setHeightAdjustable(false);
-        straightDesk.setMaximumHeight(75.0);
-        straightDesk.setWidth(140.0);
-        straightDesk.setDepth(70.0);
-        
+        // Create a drawer unit
+        DrawerUnit drawerUnit = new DrawerUnit();
+        drawerUnit.setName("Mobile Drawer Unit");
+        drawerUnit.setCategory("Drawer Units");
+        drawerUnit.setDateAdded(LocalDateTime.now().minusDays(10));
+        drawerUnit.setMaterialCondition("New");
+        drawerUnit.setColor("Black");
+        drawerUnit.setNotes("Includes 3 drawers for storage");
+        drawerUnit.setWidth(60.0);
+        drawerUnit.setHeight(75.0);
+        drawerUnit.setDepth(45.0);
+        drawerUnit.setHasWheels(true);
+
         // Create a window
         Window window = new Window();
         window.setName("Double Glazed Window");
@@ -151,7 +150,7 @@ public class DataInitializer {
         // Create office cabinet
         OfficeCabinet cabinet = new OfficeCabinet();
         cabinet.setName("File Storage Cabinet");
-        cabinet.setCategory("Storage");
+        cabinet.setCategory("Cabinets");
         cabinet.setDateAdded(LocalDateTime.now().minusDays(3));
         cabinet.setMaterialCondition("Reusable");
         cabinet.setColor("Gray");
@@ -162,12 +161,12 @@ public class DataInitializer {
         cabinet.setOpeningType(OfficeCabinet.OpeningType.DOORS);
         
         // Save all materials first to get IDs
-        List<MaterialRecord> savedMaterials = materialRepository.saveAll(Arrays.asList(desk, straightDesk, window, door, cabinet));
+        List<MaterialRecord> savedMaterials = materialRepository.saveAll(Arrays.asList(desk, drawerUnit, window, door, cabinet));
         
         // Create placeholder pictures for the materials
         // (in a real app, you'd load actual images, but for testing we'll create dummy data)
         createDummyPicture(desk, "desk.jpg", materialPictureRepository);
-        createDummyPicture(straightDesk, "straight_desk.jpg", materialPictureRepository);
+        createDummyPicture(drawerUnit, "drawer_unit.jpg", materialPictureRepository);
         createDummyPicture(window, "window.jpg", materialPictureRepository);
         createDummyPicture(door, "door.jpg", materialPictureRepository);
         createDummyPicture(cabinet, "cabinet.jpg", materialPictureRepository);
