@@ -53,6 +53,74 @@ const getFallbackImageByType = (
   }
 };
 
+// Helper function to render type-specific details
+const renderTypeSpecificDetails = (material: Material): React.ReactNode => {
+  const { materialType } = material;
+
+  if (!materialType) return null;
+
+  switch (materialType.toUpperCase()) {
+    case "DESK":
+      return (
+        <>
+          <Typography variant="body1" gutterBottom>
+            <strong>Desk Type:</strong> {material.deskType || "Not specified"}
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            <strong>Height Adjustable:</strong>{" "}
+            {material.heightAdjustable ? "Yes" : "No"}
+          </Typography>
+          {material.heightAdjustable && material.maximumHeight && (
+            <Typography variant="body1" gutterBottom>
+              <strong>Maximum Height:</strong> {material.maximumHeight} cm
+            </Typography>
+          )}
+        </>
+      );
+    case "DOOR":
+      return (
+        <Typography variant="body1" gutterBottom>
+          <strong>Swing Direction:</strong>{" "}
+          {material.swingDirection || "Not specified"}
+        </Typography>
+      );
+    case "WINDOW":
+      return (
+        <>
+          <Typography variant="body1" gutterBottom>
+            <strong>Opening Type:</strong>{" "}
+            {material.openingType || "Not specified"}
+          </Typography>
+          {material.hingeSide && (
+            <Typography variant="body1" gutterBottom>
+              <strong>Hinge Side:</strong> {material.hingeSide}
+            </Typography>
+          )}
+          {material.uValue && (
+            <Typography variant="body1" gutterBottom>
+              <strong>U-Value:</strong> {material.uValue}
+            </Typography>
+          )}
+        </>
+      );
+    case "OFFICE_CABINET":
+      return (
+        <Typography variant="body1" gutterBottom>
+          <strong>Opening Type:</strong>{" "}
+          {material.openingType || "Not specified"}
+        </Typography>
+      );
+    case "DRAWER_UNIT":
+      return (
+        <Typography variant="body1" gutterBottom>
+          <strong>Has Wheels:</strong> {material.hasWheels ? "Yes" : "No"}
+        </Typography>
+      );
+    default:
+      return null;
+  }
+};
+
 const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
   material,
 }) => {
@@ -119,10 +187,30 @@ const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
                 }
               />
             </Box>
+
+            {/* Basic information */}
             <Typography variant="body1" gutterBottom>
               <strong>Dimensions:</strong> {material.height} cm x{" "}
               {material.width} cm x {material.depth} cm
             </Typography>
+
+            {material.color && (
+              <Typography variant="body1" gutterBottom>
+                <strong>Color:</strong> {material.color}
+              </Typography>
+            )}
+
+            {/* Type-specific details section */}
+            {renderTypeSpecificDetails(material) && (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="subtitle1" gutterBottom>
+                  {material.materialType} Specific Details
+                </Typography>
+                {renderTypeSpecificDetails(material)}
+              </>
+            )}
+
             <Typography
               variant="caption"
               color="text.secondary"
@@ -130,9 +218,14 @@ const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
             >
               Added on {formatDate(material.dateAdded)}
             </Typography>
+
+            {/* Notes section */}
             {material.notes && (
               <>
                 <Divider sx={{ my: 2 }} />
+                <Typography variant="subtitle1" gutterBottom>
+                  Additional Notes
+                </Typography>
                 <Typography variant="body2">{material.notes}</Typography>
               </>
             )}
