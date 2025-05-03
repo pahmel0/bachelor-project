@@ -6,8 +6,9 @@ import MaterialsGrid from "../components/MaterialsGrid";
 import { Material } from "../types/material";
 import materialService from "../services/materialService";
 
+// Updated to match the SearchFilterBar interface
 interface FilterState {
-  objectTypes: string[];
+  categories: string[];
   materialTypes: string[];
   conditions: string[];
 }
@@ -17,7 +18,7 @@ const Materials = () => {
   const [filteredMaterials, setFilteredMaterials] = useState<Material[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<FilterState>({
-    objectTypes: [],
+    categories: [],
     materialTypes: [],
     conditions: [],
   });
@@ -89,11 +90,11 @@ const Materials = () => {
       );
     }
 
-    // Apply category filters
-    if (filters.objectTypes.length > 0) {
+    // Apply category filters - updated to use categories property
+    if (filters.categories.length > 0) {
       result = result.filter((material) =>
         material.category
-          ? filters.objectTypes.includes(material.category)
+          ? filters.categories.includes(material.category)
           : false
       );
     }

@@ -96,7 +96,7 @@ public class DataInitializer {
         // Create a desk
         Desk desk = new Desk();
         desk.setName("Corner Office Desk");
-        desk.setCategory("Desks");
+        desk.setCategory("Furniture");
         desk.setDateAdded(LocalDateTime.now().minusDays(5));
         desk.setMaterialCondition("Reusable");
         desk.setColor("Oak");
@@ -110,7 +110,7 @@ public class DataInitializer {
         // Create a drawer unit
         DrawerUnit drawerUnit = new DrawerUnit();
         drawerUnit.setName("Mobile Drawer Unit");
-        drawerUnit.setCategory("Drawer Units");
+        drawerUnit.setCategory("Furniture");
         drawerUnit.setDateAdded(LocalDateTime.now().minusDays(10));
         drawerUnit.setMaterialCondition("New");
         drawerUnit.setColor("Black");
@@ -150,7 +150,7 @@ public class DataInitializer {
         // Create office cabinet
         OfficeCabinet cabinet = new OfficeCabinet();
         cabinet.setName("File Storage Cabinet");
-        cabinet.setCategory("Cabinets");
+        cabinet.setCategory("Storage");
         cabinet.setDateAdded(LocalDateTime.now().minusDays(3));
         cabinet.setMaterialCondition("Reusable");
         cabinet.setColor("Gray");

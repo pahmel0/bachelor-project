@@ -16,17 +16,14 @@ import {
 } from "@mui/icons-material";
 
 // Filter options - updating to match the actual backend values
-const objectTypes = ["OFFICE_CABINET", "DESK", "DOOR", "DRAWER_UNIT", "WINDOW"];
 const materialTypes = [
-  "Wood",
-  "Metal",
-  "Plastic",
-  "Glass",
-  "Fabric",
-  "Composite",
-  "Paper",
-  "Other",
+  "DESK",
+  "WINDOW",
+  "DOOR",
+  "DRAWER_UNIT",
+  "OFFICE_CABINET",
 ];
+const categories = ["Furniture", "Windows", "Doors", "Storage"];
 const conditions = ["Reusable", "Repairable", "Damaged"];
 
 interface SearchFilterBarProps {
@@ -35,13 +32,13 @@ interface SearchFilterBarProps {
 }
 
 interface FilterState {
-  objectTypes: string[];
+  categories: string[];
   materialTypes: string[];
   conditions: string[];
 }
 
-// Helper function to display object types in a readable format
-const formatObjectType = (type: string): string => {
+// Helper function to display material types in a readable format
+const formatMaterialType = (type: string): string => {
   switch (type) {
     case "OFFICE_CABINET":
       return "Office Cabinet";
@@ -56,7 +53,7 @@ const SearchFilterBar = ({ onSearch, onFilter }: SearchFilterBarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [filters, setFilters] = useState<FilterState>({
-    objectTypes: [],
+    categories: [],
     materialTypes: [],
     conditions: [],
   });
@@ -81,7 +78,7 @@ const SearchFilterBar = ({ onSearch, onFilter }: SearchFilterBarProps) => {
 
   const handleFilterReset = () => {
     const resetFilters = {
-      objectTypes: [],
+      categories: [],
       materialTypes: [],
       conditions: [],
     };
@@ -130,7 +127,7 @@ const SearchFilterBar = ({ onSearch, onFilter }: SearchFilterBarProps) => {
   };
 
   const hasActiveFilters =
-    filters.objectTypes.length > 0 ||
+    filters.categories.length > 0 ||
     filters.materialTypes.length > 0 ||
     filters.conditions.length > 0;
 
@@ -178,11 +175,11 @@ const SearchFilterBar = ({ onSearch, onFilter }: SearchFilterBarProps) => {
       {/* Active filters display */}
       {hasActiveFilters && (
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
-          {filters.objectTypes.map((filter) => (
+          {filters.categories.map((filter) => (
             <Chip
-              key={`object-${filter}`}
-              label={formatObjectType(filter)}
-              onDelete={() => removeFilter("objectTypes", filter)}
+              key={`category-${filter}`}
+              label={filter}
+              onDelete={() => removeFilter("categories", filter)}
               color="primary"
               variant="outlined"
             />
@@ -190,7 +187,7 @@ const SearchFilterBar = ({ onSearch, onFilter }: SearchFilterBarProps) => {
           {filters.materialTypes.map((filter) => (
             <Chip
               key={`material-${filter}`}
-              label={filter}
+              label={formatMaterialType(filter)}
               onDelete={() => removeFilter("materialTypes", filter)}
               color="secondary"
               variant="outlined"
@@ -226,18 +223,18 @@ const SearchFilterBar = ({ onSearch, onFilter }: SearchFilterBarProps) => {
         }}
       >
         <Box sx={{ mb: 2 }}>
-          <Box sx={{ fontWeight: "bold", mb: 1 }}>Object Type</Box>
+          <Box sx={{ fontWeight: "bold", mb: 1 }}>Category</Box>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-            {objectTypes.map((type) => (
+            {categories.map((category) => (
               <Chip
-                key={type}
-                label={formatObjectType(type)}
-                onClick={() => toggleFilter("objectTypes", type)}
+                key={category}
+                label={category}
+                onClick={() => toggleFilter("categories", category)}
                 color={
-                  filters.objectTypes.includes(type) ? "primary" : "default"
+                  filters.categories.includes(category) ? "primary" : "default"
                 }
                 variant={
-                  filters.objectTypes.includes(type) ? "filled" : "outlined"
+                  filters.categories.includes(category) ? "filled" : "outlined"
                 }
               />
             ))}
@@ -252,7 +249,7 @@ const SearchFilterBar = ({ onSearch, onFilter }: SearchFilterBarProps) => {
             {materialTypes.map((type) => (
               <Chip
                 key={type}
-                label={type}
+                label={formatMaterialType(type)}
                 onClick={() => toggleFilter("materialTypes", type)}
                 color={
                   filters.materialTypes.includes(type) ? "secondary" : "default"
