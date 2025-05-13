@@ -13,7 +13,7 @@ import {
   Dashboard as DashboardIcon,
   Inventory as InventoryIcon,
   AddBox as AddBoxIcon,
-  Assessment as AssessmentIcon,
+  TableChart as TableChartIcon,
   Settings as SettingsIcon,
 } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -24,7 +24,11 @@ const menuItems = [
   { text: "Dashboard", icon: <DashboardIcon />, path: "/" },
   { text: "Materials Inventory", icon: <InventoryIcon />, path: "/materials" },
   { text: "Import/New Entry", icon: <AddBoxIcon />, path: "/import" },
-  { text: "Reports", icon: <AssessmentIcon />, path: "/reports" },
+  {
+    text: "Excel Import/Export",
+    icon: <TableChartIcon />,
+    path: "/excelOperations",
+  },
   { text: "Settings", icon: <SettingsIcon />, path: "/settings" },
 ];
 

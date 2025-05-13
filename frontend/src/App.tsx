@@ -11,6 +11,7 @@ import Materials from "./pages/Materials";
 import ImportMaterial from "./pages/ImportMaterial";
 import MaterialDetail from "./pages/MaterialDetail";
 import Login from "./pages/Login";
+import ExcelOperations from "./pages/ExcelOperations";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useEffect } from "react";
 import authService from "./services/authService";
@@ -74,8 +75,7 @@ const theme = createTheme({
   },
 });
 
-// Placeholder components for routes
-const Reports = () => <div>Reports Content</div>;
+// Placeholder component for settings
 const Settings = () => <div>Settings Content</div>;
 
 function App() {
@@ -90,7 +90,6 @@ function App() {
         <Routes>
           {/* Public route for login */}
           <Route path="/login" element={<Login />} />
-
           {/* Protected routes with Layout */}
           <Route
             path="/"
@@ -131,13 +130,13 @@ function App() {
                 </Layout>
               </ProtectedRoute>
             }
-          />
+          />{" "}
           <Route
-            path="/reports"
+            path="/excelOperations"
             element={
               <ProtectedRoute>
                 <Layout>
-                  <Reports />
+                  <ExcelOperations />
                 </Layout>
               </ProtectedRoute>
             }
@@ -152,7 +151,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           {/* Redirect any unknown routes to the homepage */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
