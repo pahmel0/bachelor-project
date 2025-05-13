@@ -121,6 +121,44 @@ const materialService = {
       throw error;
     }
   },
+
+  /**
+   * Import materials from Excel
+   */
+  importMaterialsFromExcel: async (file: File): Promise<string> => {
+    try {
+      // Create form data to send the file
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await api.post("/materials/import-excel", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error importing materials from Excel:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Export materials to Excel
+   */
+  exportMaterialsToExcel: async (): Promise<Blob> => {
+    try {
+      const response = await api.get("/materials/export-excel", {
+        responseType: "blob", // Important: needed for binary data
+      });
+      return new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+    } catch (error) {
+      console.error("Error exporting materials to Excel:", error);
+      throw error;
+    }
+  },
 };
 
 export default materialService;
