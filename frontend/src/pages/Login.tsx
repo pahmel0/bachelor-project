@@ -58,75 +58,144 @@ const Login = () => {
   };
 
   return (
-    <Container component="main" maxWidth="sm">
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <Card sx={{ width: "100%", maxWidth: 450, mt: -10 }}>
-          <CardContent sx={{ p: 4 }}>
-            <Typography variant="h4" component="h1" align="center" gutterBottom>
-              Material Management System
-            </Typography>
-
-            <Typography variant="h5" component="h2" align="center" gutterBottom>
-              Login
-            </Typography>
-
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            )}
-
-            <Box component="form" onSubmit={handleLogin} noValidate>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                autoFocus
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                error={!!error && !email}
-              />
-
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                error={!!error && !password}
-              />
-
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2, py: 1.5 }}
-                disabled={loading}
+    <Box
+      sx={{
+        width: "100%",
+        minHeight: "100vh",
+        backgroundImage: 'url("/atvinbackground.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Container component="main" maxWidth="sm">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {" "}
+          <Card
+            sx={{
+              width: "100%",
+              maxWidth: 450,
+              backgroundColor: "rgba(31, 41, 55, 0.85)",
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+            }}
+          >
+            <CardContent sx={{ p: 4 }}>
+              <Typography
+                variant="h4"
+                component="h1"
+                align="center"
+                gutterBottom
+                sx={{ color: "#ffffff" }}
               >
-                {loading ? <CircularProgress size={24} /> : "Sign In"}
-              </Button>
-            </Box>
-          </CardContent>
-        </Card>
-      </Box>
-    </Container>
+                Material Management System
+              </Typography>
+              <Typography
+                variant="h5"
+                component="h2"
+                align="center"
+                gutterBottom
+                sx={{ color: "#ffffff" }}
+              >
+                Login
+              </Typography>
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}{" "}
+              <Box component="form" onSubmit={handleLogin} noValidate>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  error={!!error && !email}
+                  InputLabelProps={{
+                    style: { color: "rgba(255, 255, 255, 0.7)" },
+                  }}
+                  InputProps={{
+                    style: { color: "#ffffff" },
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "rgba(255, 255, 255, 0.3)",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "rgba(255, 255, 255, 0.5)",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "rgba(255, 255, 255, 0.7)",
+                      },
+                    },
+                  }}
+                />
+
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  error={!!error && !password}
+                  InputLabelProps={{
+                    style: { color: "rgba(255, 255, 255, 0.7)" },
+                  }}
+                  InputProps={{
+                    style: { color: "#ffffff" },
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "rgba(255, 255, 255, 0.3)",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "rgba(255, 255, 255, 0.5)",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "rgba(255, 255, 255, 0.7)",
+                      },
+                    },
+                  }}
+                />
+
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2, py: 1.5 }}
+                  disabled={loading}
+                >
+                  {loading ? <CircularProgress size={24} /> : "Sign In"}
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 
