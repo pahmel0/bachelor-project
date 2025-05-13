@@ -32,7 +32,12 @@ const menuItems = [
   { text: "Settings", icon: <SettingsIcon />, path: "/settings" },
 ];
 
-const Sidebar = () => {
+interface SidebarProps {
+  mobileOpen: boolean;
+  onDrawerToggle: () => void;
+}
+
+const Sidebar = ({ mobileOpen, onDrawerToggle }: SidebarProps) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -76,12 +81,32 @@ const Sidebar = () => {
       </List>
     </div>
   );
-
   return (
     <Box
       component="nav"
       sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
     >
+      {/* Mobile drawer */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={onDrawerToggle}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: { xs: "block", sm: "none" },
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            width: drawerWidth,
+            backgroundColor: theme.palette.background.default,
+            borderRight: `1px solid ${theme.palette.divider}`,
+          },
+        }}
+      >
+        {drawer}
+      </Drawer>
+      {/* Desktop drawer */}
       <Drawer
         variant="permanent"
         sx={{

@@ -23,18 +23,17 @@ import { useNavigate } from "react-router-dom";
 import authService from "../services/authService";
 import { ColorModeContext } from "../contexts/ColorModeContext";
 
-const Header = () => {
-  const [mobileOpen, setMobileOpen] = useState(false);
+interface HeaderProps {
+  onDrawerToggle: () => void;
+}
+
+const Header = ({ onDrawerToggle }: HeaderProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const colorMode = useContext(ColorModeContext);
 
   const user = authService.getCurrentUser();
   const open = Boolean(anchorEl);
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -64,11 +63,12 @@ const Header = () => {
       }}
     >
       <Toolbar>
+        {" "}
         <IconButton
           color="inherit"
           aria-label="open drawer"
           edge="start"
-          onClick={handleDrawerToggle}
+          onClick={onDrawerToggle}
           sx={{ mr: 2, display: { sm: "none" } }}
         >
           <MenuIcon />
