@@ -21,9 +21,9 @@ public interface MaterialService {
     MaterialStatsDTO getMaterialStats();
     
     // Import/Export operations
-    void importMaterialsFromCsv(MultipartFile csvFile);
-    byte[] exportMaterialsToCsv();
-    
+    void importMaterialsFromExcel(MultipartFile excelFile);
+    byte[] exportMaterialsToExcel();
+
     // Picture management
     void addPicturesToMaterial(Long materialId, List<MultipartFile> pictures);
     void removePictureFromMaterial(Long materialId, Long pictureId);

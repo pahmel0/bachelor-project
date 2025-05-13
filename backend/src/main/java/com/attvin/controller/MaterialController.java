@@ -61,20 +61,7 @@ public class MaterialController {
         return ResponseEntity.ok(materialService.getMaterialStats());
     }
     
-    @PostMapping("/import")
-    public ResponseEntity<Void> importMaterials(@RequestParam("file") MultipartFile csvFile) {
-        materialService.importMaterialsFromCsv(csvFile);
-        return ResponseEntity.ok().build();
-    }
-    
-    @GetMapping("/export")
-    public ResponseEntity<byte[]> exportMaterials() {
-        byte[] csvData = materialService.exportMaterialsToCsv();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=materials.csv")
-                .contentType(MediaType.parseMediaType("text/csv"))
-                .body(csvData);
-    }
+
     
     @PostMapping("/{id}/pictures")
     public ResponseEntity<Void> addPictures(

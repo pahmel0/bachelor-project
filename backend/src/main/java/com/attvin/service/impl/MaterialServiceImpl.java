@@ -408,12 +408,12 @@ public class MaterialServiceImpl implements MaterialService {
     }
 
     @Override
-    public void importMaterialsFromCsv(MultipartFile csvFile) {
+    public void importMaterialsFromExcel(MultipartFile excelFile) {
         // Stub implementation
     }
 
     @Override
-    public byte[] exportMaterialsToCsv() {
+    public byte[] exportMaterialsToExcel() {
         // Stub implementation
         return new byte[0];
     }
