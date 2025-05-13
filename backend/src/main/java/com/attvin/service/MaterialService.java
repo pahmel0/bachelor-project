@@ -23,6 +23,7 @@ public interface MaterialService {
     // Import/Export operations
     void importMaterialsFromExcel(MultipartFile excelFile);
     byte[] exportMaterialsToExcel();
+    byte[] generateExcelTemplate();
 
     // Picture management
     void addPicturesToMaterial(Long materialId, List<MultipartFile> pictures);

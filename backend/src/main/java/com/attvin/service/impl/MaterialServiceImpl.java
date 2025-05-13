@@ -15,6 +15,8 @@ import com.attvin.repository.MaterialPictureRepository;
 import com.attvin.service.MaterialService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -409,7 +411,9 @@ public class MaterialServiceImpl implements MaterialService {
             
             return dto;
         });
-    }    @Override
+    }    
+    
+    @Override
     @Transactional
     public void importMaterialsFromExcel(MultipartFile excelFile) {
         try (var workbook = new XSSFWorkbook(excelFile.getInputStream())) {
@@ -754,5 +758,241 @@ public class MaterialServiceImpl implements MaterialService {
             
         // Return the binary data
         return picture.getPictureData();
+    }
+      
+    @Override
+    public byte[] generateExcelTemplate() {
+        try {
+            // Create workbook and sheet
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Material Template");
+            
+            // Create header row with styles
+            Row headerRow = sheet.createRow(0);
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+            
+            // Define the headers (same as export)
+            String[] headers = {
+                "Name", "Category", "Material Type", "Condition", "Color", "Notes", 
+                "Width", "Height", "Depth", 
+                "Desk Type", "Height Adjustable", "Max Height",
+                "Opening Type", "Hinge Side", "U-Value", 
+                "Swing Direction", "Has Wheels"
+            };
+            
+            // Create header cells
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+            
+            // Create sample rows for each material type with actual enum values from models
+            
+            // DESK EXAMPLE
+            Row deskRow = sheet.createRow(1);
+            deskRow.createCell(0).setCellValue("Corner Office Desk");
+            deskRow.createCell(1).setCellValue("Office Furniture");
+            deskRow.createCell(2).setCellValue("Desk");
+            deskRow.createCell(3).setCellValue("Good");
+            deskRow.createCell(4).setCellValue("Oak");
+            deskRow.createCell(5).setCellValue("Adjustable corner desk with cable management");
+            deskRow.createCell(6).setCellValue(160.0); // Width in cm
+            deskRow.createCell(7).setCellValue(78.0);  // Height in cm
+            deskRow.createCell(8).setCellValue(80.0);  // Depth in cm
+            deskRow.createCell(9).setCellValue("CORNER_DESK");  // Exact enum value from DeskType
+            deskRow.createCell(10).setCellValue(true);  // Height adjustable
+            deskRow.createCell(11).setCellValue(120.0); // Maximum height in cm
+            
+            // WINDOW EXAMPLE
+            Row windowRow = sheet.createRow(2);
+            windowRow.createCell(0).setCellValue("Side-hung Window");
+            windowRow.createCell(1).setCellValue("Building Materials");
+            windowRow.createCell(2).setCellValue("Window");
+            windowRow.createCell(3).setCellValue("Excellent");
+            windowRow.createCell(4).setCellValue("White");
+            windowRow.createCell(5).setCellValue("Low-E glass, argon filled, energy efficient");
+            windowRow.createCell(6).setCellValue(90.0); // Width in cm
+            windowRow.createCell(7).setCellValue(120.0); // Height in cm
+            windowRow.createCell(12).setCellValue("SIDE_HUNG"); // Exact enum value from OpeningType
+            windowRow.createCell(13).setCellValue("LEFT"); // Exact enum value from HingeSide
+            windowRow.createCell(14).setCellValue(1.2); // U-Value
+            
+            // DOOR EXAMPLE
+            Row doorRow = sheet.createRow(3);
+            doorRow.createCell(0).setCellValue("Office Door");
+            doorRow.createCell(1).setCellValue("Interior Doors");
+            doorRow.createCell(2).setCellValue("Door");
+            doorRow.createCell(3).setCellValue("Good");
+            doorRow.createCell(4).setCellValue("Maple");
+            doorRow.createCell(5).setCellValue("Standard office door with window panel");
+            doorRow.createCell(6).setCellValue(90.0); // Width in cm
+            doorRow.createCell(7).setCellValue(210.0); // Height in cm
+            doorRow.createCell(15).setCellValue("RIGHT"); // Exact enum value from SwingDirection
+            doorRow.createCell(14).setCellValue(1.8); // U-Value
+            
+            // DRAWER UNIT EXAMPLE
+            Row drawerRow = sheet.createRow(4);
+            drawerRow.createCell(0).setCellValue("Mobile Pedestal");
+            drawerRow.createCell(1).setCellValue("Office Storage");
+            drawerRow.createCell(2).setCellValue("DrawerUnit");
+            drawerRow.createCell(3).setCellValue("Fair");
+            drawerRow.createCell(4).setCellValue("Grey");
+            drawerRow.createCell(5).setCellValue("3-drawer mobile pedestal with lock");
+            drawerRow.createCell(6).setCellValue(40.0); // Width in cm
+            drawerRow.createCell(7).setCellValue(60.0); // Height in cm
+            drawerRow.createCell(8).setCellValue(55.0); // Depth in cm
+            drawerRow.createCell(16).setCellValue(true); // Has wheels
+            
+            // OFFICE CABINET EXAMPLE
+            Row cabinetRow = sheet.createRow(5);
+            cabinetRow.createCell(0).setCellValue("Tall Storage Cabinet");
+            cabinetRow.createCell(1).setCellValue("Office Storage");
+            cabinetRow.createCell(2).setCellValue("OfficeCabinet");
+            cabinetRow.createCell(3).setCellValue("Excellent");
+            cabinetRow.createCell(4).setCellValue("Beech");
+            cabinetRow.createCell(5).setCellValue("Tall storage cabinet with adjustable shelves");
+            cabinetRow.createCell(6).setCellValue(80.0); // Width in cm
+            cabinetRow.createCell(7).setCellValue(200.0); // Height in cm
+            cabinetRow.createCell(8).setCellValue(45.0); // Depth in cm
+            cabinetRow.createCell(12).setCellValue("DOORS"); // Exact enum value from OpeningType
+            
+            // Create additional comment cells with instructions
+            Row instructionRow = sheet.createRow(6);
+            Cell instructionCell = instructionRow.createCell(0);
+            instructionCell.setCellValue("Instructions: Delete these sample rows before importing. Add your materials starting from row 1. Required fields: Name, Category, Material Type, Condition.");
+            
+            // Add detailed comments to column headers explaining required values and formats
+            addComment(sheet, 0, 0, "Required: Descriptive name of the material (max 100 chars)");
+            addComment(sheet, 0, 1, "Required: Category such as 'Office Furniture', 'Building Materials', 'Interior Doors', 'Office Storage', etc.");
+            addComment(sheet, 0, 2, "Required: Must be exactly one of these types: Window, Door, Desk, DrawerUnit, OfficeCabinet");
+            addComment(sheet, 0, 3, "Required: Material condition - Good, Fair, Excellent, Poor, Damaged, New");
+            addComment(sheet, 0, 4, "Material color - e.g., White, Oak, Maple, Grey, Black, etc.");
+            addComment(sheet, 0, 5, "Additional notes about the material (max 500 chars)");
+            addComment(sheet, 0, 6, "Width in cm - numeric value (required for all material types)");
+            addComment(sheet, 0, 7, "Height in cm - numeric value (required for all material types except Desk)");
+            addComment(sheet, 0, 8, "Depth in cm - numeric value (required for Desk, DrawerUnit, OfficeCabinet)");
+            
+            // Type-specific field comments
+            addComment(sheet, 0, 9, "For Desk only: Must be exactly CORNER_DESK or STRAIGHT_DESK");
+            addComment(sheet, 0, 10, "For Desk only: true or false - whether height is adjustable");
+            addComment(sheet, 0, 11, "For Desk only: Maximum height in cm if adjustable");
+            addComment(sheet, 0, 12, "For Window: Must be one of FIXED_PANE, TOP_HUNG, SIDE_HUNG, TILT, SLIDING\nFor OfficeCabinet: Must be one of DOORS, SLIDING_DOORS, NO_DOORS");
+            addComment(sheet, 0, 13, "For Window only: Must be one of RIGHT, LEFT, TOP, BOTTOM, NONE");
+            addComment(sheet, 0, 14, "For Window/Door only: U-Value (thermal transmittance) - lower is better");
+            addComment(sheet, 0, 15, "For Door only: Must be either RIGHT or LEFT");
+            addComment(sheet, 0, 16, "For DrawerUnit only: true or false - whether unit has wheels");
+            
+            // Auto-size columns for better readability
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+            
+            // Merge the instruction cell across multiple columns for better visibility
+            sheet.addMergedRegion(new CellRangeAddress(6, 6, 0, 8));
+            
+            // Add conditional formatting to highlight required fields
+            CellStyle requiredStyle = workbook.createCellStyle();
+            Font requiredFont = workbook.createFont();
+            requiredFont.setBold(true);
+            requiredFont.setColor(IndexedColors.RED.getIndex());
+            requiredStyle.setFont(requiredFont);
+            
+            // Apply to headers of required fields
+            for (int i = 0; i <= 3; i++) {  // Name, Category, MaterialType, Condition
+                headerRow.getCell(i).setCellStyle(requiredStyle);
+            }
+            
+            // Add data validations for material type and other enums
+            DataValidationHelper validationHelper = sheet.getDataValidationHelper();
+            
+            // Material Type validation
+            CellRangeAddressList materialTypeRange = new CellRangeAddressList(1, 100, 2, 2);
+            DataValidationConstraint materialTypeConstraint = validationHelper.createExplicitListConstraint(
+                    new String[] {"Window", "Door", "Desk", "DrawerUnit", "OfficeCabinet"});
+            DataValidation materialTypeValidation = validationHelper.createValidation(materialTypeConstraint, materialTypeRange);
+            materialTypeValidation.setShowErrorBox(true);
+            materialTypeValidation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+            materialTypeValidation.createErrorBox("Invalid Material Type", "Material Type must be one of: Window, Door, Desk, DrawerUnit, OfficeCabinet");
+            sheet.addValidationData(materialTypeValidation);
+            
+            // Desk Type validation
+            CellRangeAddressList deskTypeRange = new CellRangeAddressList(1, 100, 9, 9);
+            DataValidationConstraint deskTypeConstraint = validationHelper.createExplicitListConstraint(
+                    new String[] {"CORNER_DESK", "STRAIGHT_DESK"});
+            DataValidation deskTypeValidation = validationHelper.createValidation(deskTypeConstraint, deskTypeRange);
+            deskTypeValidation.setShowErrorBox(true);
+            sheet.addValidationData(deskTypeValidation);
+            
+            // Window Opening Type validation
+            CellRangeAddressList windowOpeningTypeRange = new CellRangeAddressList(1, 100, 12, 12);
+            DataValidationConstraint windowOpeningTypeConstraint = validationHelper.createExplicitListConstraint(
+                    new String[] {"FIXED_PANE", "TOP_HUNG", "SIDE_HUNG", "TILT", "SLIDING"});
+            DataValidation windowOpeningTypeValidation = validationHelper.createValidation(windowOpeningTypeConstraint, windowOpeningTypeRange);
+            windowOpeningTypeValidation.setShowErrorBox(true);
+            sheet.addValidationData(windowOpeningTypeValidation);
+            
+            // Cabinet Opening Type validation
+            CellRangeAddressList cabinetOpeningTypeRange = new CellRangeAddressList(1, 100, 12, 12);
+            DataValidationConstraint cabinetOpeningTypeConstraint = validationHelper.createExplicitListConstraint(
+                    new String[] {"DOORS", "SLIDING_DOORS", "NO_DOORS"});
+            DataValidation cabinetOpeningTypeValidation = validationHelper.createValidation(cabinetOpeningTypeConstraint, cabinetOpeningTypeRange);
+            cabinetOpeningTypeValidation.setShowErrorBox(true);
+            sheet.addValidationData(cabinetOpeningTypeValidation);
+            
+            // Window Hinge Side validation
+            CellRangeAddressList hingeSideRange = new CellRangeAddressList(1, 100, 13, 13);
+            DataValidationConstraint hingeSideConstraint = validationHelper.createExplicitListConstraint(
+                    new String[] {"RIGHT", "LEFT", "TOP", "BOTTOM", "NONE"});
+            DataValidation hingeSideValidation = validationHelper.createValidation(hingeSideConstraint, hingeSideRange);
+            hingeSideValidation.setShowErrorBox(true);
+            sheet.addValidationData(hingeSideValidation);
+            
+            // Door Swing Direction validation
+            CellRangeAddressList swingDirectionRange = new CellRangeAddressList(1, 100, 15, 15);
+            DataValidationConstraint swingDirectionConstraint = validationHelper.createExplicitListConstraint(
+                    new String[] {"RIGHT", "LEFT"});
+            DataValidation swingDirectionValidation = validationHelper.createValidation(swingDirectionConstraint, swingDirectionRange);
+            swingDirectionValidation.setShowErrorBox(true);
+            sheet.addValidationData(swingDirectionValidation);
+            
+            // Write the workbook to a byte array
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            workbook.close();
+            
+            return outputStream.toByteArray();
+            
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to generate Excel template", e);
+        }
+    }
+    
+    /**
+     * Helper method to add comments to cells
+     */
+    private void addComment(Sheet sheet, int row, int column, String commentText) {
+        Workbook workbook = sheet.getWorkbook();
+        CreationHelper factory = workbook.getCreationHelper();
+        ClientAnchor anchor = factory.createClientAnchor();
+        
+        // Set comment position
+        anchor.setCol1(column);
+        anchor.setCol2(column + 3);
+        anchor.setRow1(row);
+        anchor.setRow2(row + 3);
+        
+        // Create the comment
+        Drawing<?> drawing = sheet.createDrawingPatriarch();
+        Comment comment = drawing.createCellComment(anchor);
+        RichTextString str = factory.createRichTextString(commentText);
+        comment.setString(str);
+        
+        // Assign the comment to the cell
+        Cell cell = sheet.getRow(row).getCell(column);
+        cell.setCellComment(comment);
     }
 }
