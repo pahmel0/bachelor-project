@@ -142,7 +142,6 @@ const materialService = {
       throw error;
     }
   },
-
   /**
    * Export materials to Excel
    */
@@ -156,6 +155,23 @@ const materialService = {
       });
     } catch (error) {
       console.error("Error exporting materials to Excel:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Download Excel template for material import
+   */
+  downloadExcelTemplate: async (): Promise<Blob> => {
+    try {
+      const response = await api.get("/materials/excel-template", {
+        responseType: "blob", // Important: needed for binary data
+      });
+      return new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+    } catch (error) {
+      console.error("Error downloading Excel template:", error);
       throw error;
     }
   },
