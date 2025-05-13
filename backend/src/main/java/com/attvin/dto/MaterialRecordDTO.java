@@ -10,7 +10,7 @@ public class MaterialRecordDTO {
     private String name;
     private String category;
     private String materialType;
-    private String condition;
+    private String materialCondition;
     private String color;
     private String notes;
     private LocalDateTime dateAdded;
@@ -27,4 +27,6 @@ public class MaterialRecordDTO {
     private String swingDirection;
     private Boolean heightAdjustable;
     private Boolean hasWheels;
-} 
+    private String deskType;
+    private Double maximumHeight;
+}

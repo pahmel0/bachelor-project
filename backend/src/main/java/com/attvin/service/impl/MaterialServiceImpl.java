@@ -92,7 +92,7 @@ public class MaterialServiceImpl implements MaterialService {
         // Set basic properties
         material.setName(materialDTO.getName());
         material.setCategory(materialDTO.getCategory());
-        material.setMaterialCondition(materialDTO.getCondition());
+        material.setMaterialCondition(materialDTO.getMaterialCondition());
         material.setColor(materialDTO.getColor());
         material.setNotes(materialDTO.getNotes());
         material.setDateAdded(LocalDateTime.now());
@@ -135,7 +135,7 @@ public class MaterialServiceImpl implements MaterialService {
         savedDto.setName(material.getName());
         savedDto.setCategory(material.getCategory());
         savedDto.setMaterialType(material.getClass().getSimpleName());
-        savedDto.setCondition(material.getMaterialCondition());
+        savedDto.setMaterialCondition(material.getMaterialCondition());
         savedDto.setColor(material.getColor());
         savedDto.setNotes(material.getNotes());
         savedDto.setDateAdded(material.getDateAdded());
@@ -209,6 +209,8 @@ public class MaterialServiceImpl implements MaterialService {
                 
             case "Desk":
                 Desk desk = (Desk) material;
+                desk.setDeskType(Desk.DeskType.valueOf(dto.getDeskType()));
+                desk.setMaximumHeight(dto.getMaximumHeight());
                 desk.setWidth(dto.getWidth());
                 desk.setDepth(dto.getDepth());
                 if (dto.getHeightAdjustable() != null) {
@@ -253,7 +255,7 @@ public class MaterialServiceImpl implements MaterialService {
         dto.setName(material.getName());
         dto.setCategory(material.getCategory());
         dto.setMaterialType(material.getClass().getSimpleName());
-        dto.setCondition(material.getMaterialCondition());
+        dto.setMaterialCondition(material.getMaterialCondition());
         dto.setColor(material.getColor());
         dto.setNotes(material.getNotes());
         dto.setDateAdded(material.getDateAdded());
@@ -277,7 +279,7 @@ public class MaterialServiceImpl implements MaterialService {
         // Update basic properties
         material.setName(materialDTO.getName());
         material.setCategory(materialDTO.getCategory());
-        material.setMaterialCondition(materialDTO.getCondition());
+        material.setMaterialCondition(materialDTO.getMaterialCondition());
         material.setColor(materialDTO.getColor());
         material.setNotes(materialDTO.getNotes());
         
@@ -293,7 +295,7 @@ public class MaterialServiceImpl implements MaterialService {
         updatedDTO.setName(material.getName());
         updatedDTO.setCategory(material.getCategory());
         updatedDTO.setMaterialType(material.getClass().getSimpleName());
-        updatedDTO.setCondition(material.getMaterialCondition());
+        updatedDTO.setMaterialCondition(material.getMaterialCondition());
         updatedDTO.setColor(material.getColor());
         updatedDTO.setNotes(material.getNotes());
         updatedDTO.setDateAdded(material.getDateAdded());
@@ -340,6 +342,8 @@ public class MaterialServiceImpl implements MaterialService {
                 break;
             case "Desk":
                 Desk desk = (Desk) material;
+                if (dto.getMaximumHeight() != null) desk.setMaximumHeight(dto.getMaximumHeight());
+                if (dto.getDeskType() != null) desk.setDeskType(Desk.DeskType.valueOf(dto.getDeskType()));
                 if (dto.getWidth() != null) desk.setWidth(dto.getWidth());
                 if (dto.getDepth() != null) desk.setDepth(dto.getDepth());
                 if (dto.getHeightAdjustable() != null) desk.setHeightAdjustable(dto.getHeightAdjustable());
@@ -389,7 +393,7 @@ public class MaterialServiceImpl implements MaterialService {
             dto.setName(material.getName());
             dto.setCategory(material.getCategory());
             dto.setMaterialType(material.getClass().getSimpleName()); // or another field that stores the type
-            dto.setCondition(material.getMaterialCondition());
+            dto.setMaterialCondition(material.getMaterialCondition());
             dto.setColor(material.getColor());
             dto.setNotes(material.getNotes());
             dto.setDateAdded(material.getDateAdded());

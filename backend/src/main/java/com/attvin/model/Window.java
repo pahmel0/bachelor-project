@@ -18,7 +18,7 @@ public class Window extends MaterialRecord {
     @Column(name = "opening_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private OpeningType openingType;
-    
+
     @Column(name = "hinge_side")
     @Enumerated(EnumType.STRING)
     private HingeSide hingeSide;
@@ -59,7 +59,7 @@ public class Window extends MaterialRecord {
     public void setWidth(Double width) {
         this.width = width;
     }
-    
+
     public OpeningType getOpeningType() {
         return openingType;
     }
