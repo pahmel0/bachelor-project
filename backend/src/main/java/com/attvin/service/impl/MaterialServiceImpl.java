@@ -14,12 +14,16 @@ import com.attvin.repository.MaterialRepository;
 import com.attvin.repository.MaterialPictureRepository;
 import com.attvin.service.MaterialService;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -405,17 +409,245 @@ public class MaterialServiceImpl implements MaterialService {
             
             return dto;
         });
+    }    @Override
+    @Transactional
+    public void importMaterialsFromExcel(MultipartFile excelFile) {
+        try (var workbook = new XSSFWorkbook(excelFile.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0);
+            
+            // Skip the header row
+            boolean firstRow = true;
+            
+            for (Row row : sheet) {
+                if (firstRow) {
+                    firstRow = false;
+                    continue;
+                }
+                
+                try {
+                    // Extract material data
+                    MaterialRecordDTO materialDTO = new MaterialRecordDTO();
+                    
+                    // Basic fields
+                    materialDTO.setName(getCellValueAsString(row, 0));
+                    materialDTO.setCategory(getCellValueAsString(row, 1));
+                    materialDTO.setMaterialType(getCellValueAsString(row, 2));
+                    materialDTO.setMaterialCondition(getCellValueAsString(row, 3));
+                    materialDTO.setColor(getCellValueAsString(row, 4));
+                    materialDTO.setNotes(getCellValueAsString(row, 5));
+                    
+                    // Dimensions
+                    materialDTO.setWidth(getCellValueAsDouble(row, 6));
+                    materialDTO.setHeight(getCellValueAsDouble(row, 7));
+                    materialDTO.setDepth(getCellValueAsDouble(row, 8));
+                    
+                    // Type-specific fields
+                    materialDTO.setDeskType(getCellValueAsString(row, 9));
+                    materialDTO.setHeightAdjustable(getCellValueAsBoolean(row, 10));
+                    materialDTO.setMaximumHeight(getCellValueAsDouble(row, 11));
+                    materialDTO.setOpeningType(getCellValueAsString(row, 12));
+                    materialDTO.setHingeSide(getCellValueAsString(row, 13));
+                    materialDTO.setUValue(getCellValueAsDouble(row, 14));
+                    materialDTO.setSwingDirection(getCellValueAsString(row, 15));
+                    materialDTO.setHasWheels(getCellValueAsBoolean(row, 16));
+                    
+                    // Set creation date
+                    materialDTO.setDateAdded(LocalDateTime.now());
+                    
+                    // Create the material
+                    createMaterial(materialDTO, null);
+                    
+                } catch (Exception e) {
+                    // Log the error but continue processing the next rows
+                    e.printStackTrace();
+                }
+            }
+            
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to import Excel file: " + e.getMessage(), e);
+        }
     }
 
-    @Override
-    public void importMaterialsFromExcel(MultipartFile excelFile) {
-        // Stub implementation
+    /**
+     * Helper method to get cell value as string
+     */
+    private String getCellValueAsString(Row row, int cellIndex) {
+        Cell cell = row.getCell(cellIndex);
+        if (cell == null) {
+            return null;
+        }
+        
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            default:
+                return null;
+        }
+    }
+    
+    /**
+     * Helper method to get cell value as double
+     */
+    private Double getCellValueAsDouble(Row row, int cellIndex) {
+        Cell cell = row.getCell(cellIndex);
+        if (cell == null) {
+            return null;
+        }
+        
+        switch (cell.getCellType()) {
+            case NUMERIC:
+                return cell.getNumericCellValue();
+            case STRING:
+                try {
+                    return Double.parseDouble(cell.getStringCellValue());
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            default:
+                return null;
+        }
+    }
+    
+    /**
+     * Helper method to get cell value as boolean
+     */
+    private Boolean getCellValueAsBoolean(Row row, int cellIndex) {
+        Cell cell = row.getCell(cellIndex);
+        if (cell == null) {
+            return null;
+        }
+        
+        switch (cell.getCellType()) {
+            case BOOLEAN:
+                return cell.getBooleanCellValue();
+            case STRING:
+                return Boolean.parseBoolean(cell.getStringCellValue());
+            case NUMERIC:
+                return cell.getNumericCellValue() != 0;
+            default:
+                return null;
+        }
     }
 
     @Override
     public byte[] exportMaterialsToExcel() {
-        // Stub implementation
-        return new byte[0];
+        try {
+            // Create workbook and sheet
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Materials");
+            
+            // Create header row with styles
+            Row headerRow = sheet.createRow(0);
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+            
+            // Define the headers
+            String[] headers = {
+                "Name", "Category", "Material Type", "Condition", "Color", "Notes", 
+                "Width", "Height", "Depth", 
+                "Desk Type", "Height Adjustable", "Max Height",
+                "Opening Type", "Hinge Side", "U-Value", 
+                "Swing Direction", "Has Wheels"
+            };
+            
+            // Create header cells
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+            
+            // Get all materials
+            List<MaterialRecord> materials = materialRepository.findAll();
+            
+            // Create data rows
+            int rowNum = 1;
+            for (MaterialRecord material : materials) {
+                Row row = sheet.createRow(rowNum++);
+                
+                // Basic information
+                row.createCell(0).setCellValue(material.getName());
+                row.createCell(1).setCellValue(material.getCategory());
+                row.createCell(2).setCellValue(material.getClass().getSimpleName());
+                row.createCell(3).setCellValue(material.getMaterialCondition());
+                row.createCell(4).setCellValue(material.getColor() != null ? material.getColor() : "");
+                row.createCell(5).setCellValue(material.getNotes() != null ? material.getNotes() : "");
+                
+                // Type-specific information
+                switch (material.getClass().getSimpleName()) {
+                    case "Desk":
+                        Desk desk = (Desk) material;
+                        row.createCell(6).setCellValue(desk.getWidth());
+                        row.createCell(7).setCellValue(desk.getMaximumHeight());
+                        row.createCell(8).setCellValue(desk.getDepth());
+                        row.createCell(9).setCellValue(desk.getDeskType().name());
+                        row.createCell(10).setCellValue(desk.getHeightAdjustable());
+                        row.createCell(11).setCellValue(desk.getMaximumHeight());
+                        break;
+                    
+                    case "Window":
+                        Window window = (Window) material;
+                        row.createCell(6).setCellValue(window.getWidth());
+                        row.createCell(7).setCellValue(window.getHeight());
+                        row.createCell(8).setCellValue(0); // No depth for windows
+                        row.createCell(12).setCellValue(window.getOpeningType().name());
+                        if (window.getHingeSide() != null) {
+                            row.createCell(13).setCellValue(window.getHingeSide().name());
+                        }
+                        if (window.getUValue() != null) {
+                            row.createCell(14).setCellValue(window.getUValue());
+                        }
+                        break;
+                        
+                    case "Door":
+                        Door door = (Door) material;
+                        row.createCell(6).setCellValue(door.getWidth());
+                        row.createCell(7).setCellValue(door.getHeight());
+                        row.createCell(15).setCellValue(door.getSwingDirection().name());
+                        if (door.getUValue() != null) {
+                            row.createCell(14).setCellValue(door.getUValue());
+                        }
+                        break;
+                        
+                    case "DrawerUnit":
+                        DrawerUnit drawerUnit = (DrawerUnit) material;
+                        row.createCell(6).setCellValue(drawerUnit.getWidth());
+                        row.createCell(7).setCellValue(drawerUnit.getHeight());
+                        row.createCell(8).setCellValue(drawerUnit.getDepth());
+                        row.createCell(16).setCellValue(drawerUnit.getHasWheels());
+                        break;
+                        
+                    case "OfficeCabinet":
+                        OfficeCabinet cabinet = (OfficeCabinet) material;
+                        row.createCell(6).setCellValue(cabinet.getWidth());
+                        row.createCell(7).setCellValue(cabinet.getHeight());
+                        row.createCell(8).setCellValue(cabinet.getDepth());
+                        row.createCell(12).setCellValue(cabinet.getOpeningType().name());
+                        break;
+                }
+            }
+            
+            // Auto-size columns
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+            
+            // Write the workbook to a byte array
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            workbook.close();
+            
+            return outputStream.toByteArray();
+            
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to export materials to Excel", e);
+        }
     }
 
     @Override
