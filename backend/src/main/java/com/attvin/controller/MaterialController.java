@@ -117,8 +117,7 @@ public class MaterialController {
 
     /**
      * Endpoint for exporting materials to Excel
-     */
-    @GetMapping("/export-excel")
+     */    @GetMapping("/export-excel")
     public ResponseEntity<byte[]> exportMaterialsToExcel() {
         try {
             byte[] excelContent = materialService.exportMaterialsToExcel();
@@ -131,6 +130,27 @@ public class MaterialController {
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(excelContent);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * Endpoint for generating an Excel template
+     */
+    @GetMapping("/excel-template")
+    public ResponseEntity<byte[]> getExcelTemplate() {
+        try {
+            byte[] templateContent = materialService.generateExcelTemplate();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDispositionFormData("attachment", "material-template.xlsx");
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+            
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(templateContent);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
