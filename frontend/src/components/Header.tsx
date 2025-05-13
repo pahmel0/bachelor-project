@@ -1,7 +1,6 @@
 import {
   AppBar,
   Avatar,
-  Badge,
   Box,
   IconButton,
   Toolbar,
@@ -10,21 +9,25 @@ import {
   MenuItem,
   Divider,
   ListItemIcon,
+  Tooltip,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
-  Notifications as NotificationsIcon,
   Logout as LogoutIcon,
   Settings as SettingsIcon,
+  Brightness4 as DarkModeIcon,
+  Brightness7 as LightModeIcon,
 } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../services/authService";
+import { ColorModeContext } from "../contexts/ColorModeContext";
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
+  const colorMode = useContext(ColorModeContext);
 
   const user = authService.getCurrentUser();
   const open = Boolean(anchorEl);
@@ -72,14 +75,26 @@ const Header = () => {
         </IconButton>
         <Typography variant="h6" noWrap component="div">
           Material Management System
-        </Typography>
+        </Typography>{" "}
         <Box sx={{ flexGrow: 1 }} />
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton size="large" color="inherit">
-            <Badge badgeContent={4} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+          {/* Theme toggle button */}
+          <Tooltip
+            title={
+              colorMode.mode === "dark"
+                ? "Switch to light mode"
+                : "Switch to dark mode"
+            }
+          >
+            <IconButton
+              color="inherit"
+              onClick={colorMode.toggleColorMode}
+              sx={{ mr: 1 }}
+            >
+              {colorMode.mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
+            </IconButton>
+          </Tooltip>
+
           <IconButton
             sx={{ ml: 1 }}
             onClick={handleProfileMenuOpen}
@@ -89,8 +104,7 @@ const Header = () => {
           >
             <Avatar alt="User Profile" src="/static/images/avatar/1.jpg" />
           </IconButton>
-        </Box>
-
+        </Box>{" "}
         {/* User profile menu */}
         <Menu
           anchorEl={anchorEl}
