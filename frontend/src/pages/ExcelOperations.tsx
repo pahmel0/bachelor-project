@@ -80,7 +80,6 @@ const ExcelOperations = () => {
       setImporting(false);
     }
   };
-
   const handleExport = async () => {
     try {
       setExporting(true);
@@ -115,6 +114,43 @@ const ExcelOperations = () => {
       });
     } finally {
       setExporting(false);
+    }
+  };
+
+  // Handle template download
+  const [downloadingTemplate, setDownloadingTemplate] = useState(false);
+
+  const handleTemplateDownload = async () => {
+    try {
+      setDownloadingTemplate(true);
+      const blob = await materialService.downloadExcelTemplate();
+
+      // Create a download link and trigger it
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "material-template.xlsx");
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      setSnackbar({
+        open: true,
+        message: "Template downloaded successfully!",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error("Template download failed:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to download template.",
+        severity: "error",
+      });
+    } finally {
+      setDownloadingTemplate(false);
     }
   };
 
@@ -180,6 +216,32 @@ const ExcelOperations = () => {
                   </Typography>
                 )}
               </Box>
+
+              <Grid container spacing={1} sx={{ mb: 2 }}>
+                <Grid item xs={12}>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    startIcon={<FileDownloadIcon />}
+                    onClick={handleTemplateDownload}
+                    disabled={downloadingTemplate}
+                    fullWidth
+                  >
+                    {downloadingTemplate ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      "Download Template"
+                    )}
+                  </Button>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mt: 0.5 }}
+                  >
+                    Download a template with examples and instructions
+                  </Typography>
+                </Grid>
+              </Grid>
 
               <Button
                 variant="contained"
