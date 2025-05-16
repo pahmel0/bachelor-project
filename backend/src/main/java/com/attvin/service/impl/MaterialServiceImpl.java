@@ -134,8 +134,7 @@ public class MaterialServiceImpl implements MaterialService {
             // Save the material with pictures
             material = materialRepository.save(material);
         }
-        
-        // Convert saved entity back to DTO
+          // Convert saved entity back to DTO
         MaterialRecordDTO savedDto = new MaterialRecordDTO();
         savedDto.setId(material.getId());
         savedDto.setName(material.getName());
@@ -145,6 +144,9 @@ public class MaterialServiceImpl implements MaterialService {
         savedDto.setColor(material.getColor());
         savedDto.setNotes(material.getNotes());
         savedDto.setDateAdded(material.getDateAdded());
+        
+        // Map dimensions and type-specific properties
+        mapDimensionsToDTO(material, savedDto);
         
         // Map pictures to DTOs if needed
         if (material.getPictures() != null && !material.getPictures().isEmpty()) {
@@ -247,9 +249,7 @@ public class MaterialServiceImpl implements MaterialService {
             default:
                 throw new UnsupportedOperationException("Unsupported material type: " + materialType);
         }
-    }
-
-    @Override
+    }    @Override
     public MaterialRecordDTO getMaterialById(Long id) {
         // Find the material entity by ID
         MaterialRecord material = materialRepository.findById(id)
@@ -266,11 +266,25 @@ public class MaterialServiceImpl implements MaterialService {
         dto.setNotes(material.getNotes());
         dto.setDateAdded(material.getDateAdded());
         
-        // Map other properties as needed
+        // Map dimensions and type-specific properties
+        mapDimensionsToDTO(material, dto);
         
-        // Fetch and map pictures if needed
-        // List<MaterialPicture> pictures = materialPictureRepository.findByMaterialId(id);
-        // dto.setPictures(...);
+        // Map pictures
+        if (material.getPictures() != null && !material.getPictures().isEmpty()) {
+            dto.setPictures(material.getPictures().stream()
+                .map(pic -> {
+                    MaterialPictureDTO picDto = new MaterialPictureDTO();
+                    picDto.setId(pic.getId());
+                    picDto.setFileName(pic.getFileName());
+                    picDto.setContentType(pic.getContentType());
+                    picDto.setFileSize(pic.getFileSize());
+                    picDto.setUploadDate(pic.getUploadDate());
+                    picDto.setIsPrimary(pic.getIsPrimary());
+                    picDto.setDescription(pic.getDescription());
+                    return picDto;
+                })
+                .collect(Collectors.toList()));
+        }
         
         return dto;
     }
@@ -294,8 +308,7 @@ public class MaterialServiceImpl implements MaterialService {
         
         // Save the updated material
         material = materialRepository.save(material);
-        
-        // Convert the updated entity back to DTO
+          // Convert the updated entity back to DTO
         MaterialRecordDTO updatedDTO = new MaterialRecordDTO();
         updatedDTO.setId(material.getId());
         updatedDTO.setName(material.getName());
@@ -305,6 +318,9 @@ public class MaterialServiceImpl implements MaterialService {
         updatedDTO.setColor(material.getColor());
         updatedDTO.setNotes(material.getNotes());
         updatedDTO.setDateAdded(material.getDateAdded());
+        
+        // Map dimensions and type-specific properties
+        mapDimensionsToDTO(material, updatedDTO);
         
         // Map pictures to DTOs if they exist
         if (material.getPictures() != null && !material.getPictures().isEmpty()) {
@@ -390,8 +406,7 @@ public class MaterialServiceImpl implements MaterialService {
     public Page<MaterialRecordDTO> searchMaterials(String category, String type, String condition, String query, Pageable pageable) {
         // Query the repository with the provided filters
         Page<MaterialRecord> materialsPage = materialRepository.searchMaterials(category, type, condition, query, pageable);
-        
-        // Convert the entity page to a DTO page
+          // Convert the entity page to a DTO page
         return materialsPage.map(material -> {
             MaterialRecordDTO dto = new MaterialRecordDTO();
             // Map properties from entity to DTO
@@ -404,10 +419,25 @@ public class MaterialServiceImpl implements MaterialService {
             dto.setNotes(material.getNotes());
             dto.setDateAdded(material.getDateAdded());
             
-            // Map other properties as needed
+            // Map dimensions based on material type
+            mapDimensionsToDTO(material, dto);
             
-            // Map pictures if needed
-            // dto.setPictures(...);
+            // Map pictures if they exist
+            if (material.getPictures() != null && !material.getPictures().isEmpty()) {
+                dto.setPictures(material.getPictures().stream()
+                    .map(pic -> {
+                        MaterialPictureDTO picDto = new MaterialPictureDTO();
+                        picDto.setId(pic.getId());
+                        picDto.setFileName(pic.getFileName());
+                        picDto.setContentType(pic.getContentType());
+                        picDto.setFileSize(pic.getFileSize());
+                        picDto.setUploadDate(pic.getUploadDate());
+                        picDto.setIsPrimary(pic.getIsPrimary());
+                        picDto.setDescription(pic.getDescription());
+                        return picDto;
+                    })
+                    .collect(Collectors.toList()));
+            }
             
             return dto;
         });
@@ -518,8 +548,7 @@ public class MaterialServiceImpl implements MaterialService {
     
     /**
      * Helper method to get cell value as boolean
-     */
-    private Boolean getCellValueAsBoolean(Row row, int cellIndex) {
+     */    private Boolean getCellValueAsBoolean(Row row, int cellIndex) {
         Cell cell = row.getCell(cellIndex);
         if (cell == null) {
             return null;
@@ -534,6 +563,58 @@ public class MaterialServiceImpl implements MaterialService {
                 return cell.getNumericCellValue() != 0;
             default:
                 return null;
+        }
+    }
+    
+    /**
+     * Helper method to map dimensions and type-specific properties from entity to DTO
+     */
+    private void mapDimensionsToDTO(MaterialRecord material, MaterialRecordDTO dto) {
+        String materialType = material.getClass().getSimpleName();
+        
+        switch (materialType) {
+            case "Window":
+                Window window = (Window) material;
+                dto.setHeight(window.getHeight());
+                dto.setWidth(window.getWidth());
+                dto.setOpeningType(window.getOpeningType() != null ? window.getOpeningType().name() : null);
+                dto.setHingeSide(window.getHingeSide() != null ? window.getHingeSide().name() : null);
+                dto.setUValue(window.getUValue());
+                break;
+            case "Door":
+                Door door = (Door) material;
+                dto.setHeight(door.getHeight());
+                dto.setWidth(door.getWidth());
+                dto.setSwingDirection(door.getSwingDirection() != null ? door.getSwingDirection().name() : null);
+                dto.setUValue(door.getUValue());
+                break;
+            case "Desk":
+                Desk desk = (Desk) material;
+                // For Desk, we'll use maximumHeight as height for display purposes
+                dto.setHeight(desk.getMaximumHeight());
+                dto.setWidth(desk.getWidth());
+                dto.setDepth(desk.getDepth());
+                dto.setDeskType(desk.getDeskType() != null ? desk.getDeskType().name() : null);
+                dto.setHeightAdjustable(desk.getHeightAdjustable());
+                dto.setMaximumHeight(desk.getMaximumHeight());
+                break;
+            case "DrawerUnit":
+                DrawerUnit drawerUnit = (DrawerUnit) material;
+                dto.setHeight(drawerUnit.getHeight());
+                dto.setWidth(drawerUnit.getWidth());
+                dto.setDepth(drawerUnit.getDepth());
+                dto.setHasWheels(drawerUnit.getHasWheels());
+                break;
+            case "OfficeCabinet":
+                OfficeCabinet cabinet = (OfficeCabinet) material;
+                dto.setHeight(cabinet.getHeight());
+                dto.setWidth(cabinet.getWidth());
+                dto.setDepth(cabinet.getDepth());
+                dto.setOpeningType(cabinet.getOpeningType() != null ? cabinet.getOpeningType().name() : null);
+                break;
+            default:
+                // No dimensions for unknown types
+                break;
         }
     }
 
