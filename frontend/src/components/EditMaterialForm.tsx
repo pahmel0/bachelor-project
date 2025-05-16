@@ -21,30 +21,29 @@ interface EditMaterialFormProps {
 }
 
 // Options for dropdown menus
-const objectTypeOptions = [
-  "Furniture",
-  "Building Material",
-  "Decoration",
-  "Fixture",
-  "Other",
-];
+const categoryOptions = ["Furniture", "Windows", "Doors", "Storage"];
+
 const materialTypeOptions = [
-  "Wood",
-  "Metal",
-  "Plastic",
-  "Glass",
-  "Ceramic",
-  "Textile",
-  "Composite",
-  "Other",
+  "DESK",
+  "WINDOW",
+  "DOOR",
+  "DRAWER_UNIT",
+  "OFFICE_CABINET",
 ];
-const conditionOptions = [
-  "New",
-  "Like New",
-  "Reusable",
-  "Needs Repair",
-  "For Parts",
-];
+
+const conditionOptions = ["Reusable", "Repairable", "Damaged"];
+
+// Helper function to display material types in a readable format
+const formatMaterialType = (type: string): string => {
+  switch (type) {
+    case "OFFICE_CABINET":
+      return "Office Cabinet";
+    case "DRAWER_UNIT":
+      return "Drawer Unit";
+    default:
+      return type.charAt(0) + type.slice(1).toLowerCase();
+  }
+};
 
 const EditMaterialForm: React.FC<EditMaterialFormProps> = ({
   material,
@@ -165,15 +164,15 @@ const EditMaterialForm: React.FC<EditMaterialFormProps> = ({
 
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth required error={!!errors.category}>
-            <InputLabel id="object-type-label">Object Type</InputLabel>
+            <InputLabel id="object-type-label">Category</InputLabel>
             <Select
               labelId="object-type-label"
               name="category"
               value={formData.category || ""}
-              label="Object Type"
+              label="Category"
               onChange={handleSelectChange}
             >
-              {objectTypeOptions.map((option) => (
+              {categoryOptions.map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
                 </MenuItem>
@@ -197,7 +196,7 @@ const EditMaterialForm: React.FC<EditMaterialFormProps> = ({
             >
               {materialTypeOptions.map((option) => (
                 <MenuItem key={option} value={option}>
-                  {option}
+                  {formatMaterialType(option)}
                 </MenuItem>
               ))}
             </Select>
