@@ -174,17 +174,20 @@ const MaterialDetailView: React.FC<MaterialDetailViewProps> = ({
                 mb: 2,
               }}
             >
+              {" "}
               <Chip label={material.category} color="primary" />
               <Chip label={material.materialType} color="secondary" />
               <Chip
                 label={material.condition}
-                color={
-                  material.condition === "Reusable"
-                    ? "success"
-                    : material.condition === "Repairable"
-                    ? "warning"
-                    : "error"
-                }
+                sx={{
+                  bgcolor:
+                    material.condition?.toLowerCase() === "reusable"
+                      ? "success.main"
+                      : material.condition?.toLowerCase() === "repairable"
+                      ? "warning.main"
+                      : "error.main",
+                  color: "white",
+                }}
               />
             </Box>
 
