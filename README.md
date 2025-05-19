@@ -70,6 +70,7 @@ A fullstack web application for tracking, filtering, and managing reusable furni
 
 - Create a MySQL database (e.g., `furniture_db`).
 - Update `src/main/resources/application.properties` with your database credentials.
+- Update .env file with JWT secret(visit backend folder for more INFO).
 - Build and run the backend:
 
 - cd backend
@@ -81,7 +82,7 @@ A fullstack web application for tracking, filtering, and managing reusable furni
 - cd frontend
 - npm run dev
 
-- The frontend will start at [http://localhost:5173](http://localhost:5173)
+- The application can be accessed at [http://localhost:5173](http://localhost:5173)
 
 ### 4. (Optional) Docker Compose
 
