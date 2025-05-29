@@ -950,7 +950,7 @@ public class MaterialServiceImpl implements MaterialService {
             addComment(sheet, 0, 0, "Required: Descriptive name of the material (max 100 chars)");
             addComment(sheet, 0, 1, "Required: Category such as 'Office Furniture', 'Building Materials', 'Interior Doors', 'Office Storage', etc.");
             addComment(sheet, 0, 2, "Required: Must be exactly one of these types: Window, Door, Desk, DrawerUnit, OfficeCabinet");
-            addComment(sheet, 0, 3, "Required: Material condition - Good, Fair, Excellent, Poor, Damaged, New");
+            addComment(sheet, 0, 3, "Required: Material condition - Define as Reusable, Repairable, Damaged");
             addComment(sheet, 0, 4, "Material color - e.g., White, Oak, Maple, Grey, Black, etc.");
             addComment(sheet, 0, 5, "Additional notes about the material (max 500 chars)");
             addComment(sheet, 0, 6, "Width in cm - numeric value (required for all material types)");
