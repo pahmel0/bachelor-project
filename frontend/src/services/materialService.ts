@@ -41,7 +41,6 @@ const materialService = {
       throw error;
     }
   },
-
   /**
    * Create a new material
    */
@@ -51,6 +50,40 @@ const materialService = {
       return response.data;
     } catch (error) {
       console.error("Error creating material:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Create a new material with pictures
+   */
+  createMaterialWithPictures: async (
+    materialData: object,
+    pictures: File[]
+  ): Promise<Material> => {
+    try {
+      const formData = new FormData();
+
+      // Add the material data as JSON
+      formData.append(
+        "material",
+        new Blob([JSON.stringify(materialData)], { type: "application/json" })
+      );
+
+      // Add the pictures
+      for (const picture of pictures) {
+        formData.append("pictures", picture);
+      }
+
+      const response = await api.post("/materials", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Error creating material with pictures:", error);
       throw error;
     }
   },

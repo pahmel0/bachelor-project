@@ -12,11 +12,12 @@ import {
   Alert,
   Snackbar,
 } from "@mui/material";
-import FileUploader from "../components/FileUploader";
+import MultiFileUploader from "../components/MultiFileUploader";
 import ImportForm, { MaterialFormData } from "../components/ImportForm";
 import { useNavigate } from "react-router-dom";
+import materialService from "../services/materialService";
 
-const steps = ["Upload Image", "Enter Details", "Review & Submit"];
+const steps = ["Upload Images", "Enter Details", "Review & Submit"];
 
 // Helper function to get the display label for a material type
 const objectTypeLabel = (materialType: string): string => {
@@ -33,7 +34,7 @@ const objectTypeLabel = (materialType: string): string => {
 const ImportMaterial = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState<MaterialFormData>({
     name: "",
     materialType: "",
@@ -78,9 +79,8 @@ ${formData.uValue ? `U-Value: ${formData.uValue}` : ""}`;
   };
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleFileSelect = (file: File | null) => {
-    setSelectedFile(file);
+  const handleFileSelect = (files: File[]) => {
+    setSelectedFiles(files);
   };
 
   const handleFormChange = (data: MaterialFormData) => {
@@ -94,12 +94,51 @@ ${formData.uValue ? `U-Value: ${formData.uValue}` : ""}`;
   const handleBack = () => {
     setActiveStep((prevStep) => prevStep - 1);
   };
+  const handleSubmit = async () => {
+    if (selectedFiles.length === 0 || !formData) {
+      return;
+    }
 
-  const handleSubmit = () => {
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Create material data object
+      const materialData = {
+        name: formData.name,
+        materialType: formData.materialType,
+        category: formData.category,
+        materialCondition: formData.condition, // Map condition to materialCondition for backend
+        notes: formData.notes,
+        color: formData.color,
+        // Add dimensions
+        width: formData.width,
+        height: formData.height,
+        depth: formData.depth,
+        // Add type-specific properties
+        ...(formData.deskType && { deskType: formData.deskType }),
+        ...(formData.heightAdjustable !== undefined && {
+          heightAdjustable: formData.heightAdjustable,
+        }),
+        ...(formData.maximumHeight && {
+          maximumHeight: formData.maximumHeight,
+        }),
+        ...(formData.openingType && { openingType: formData.openingType }),
+        ...(formData.hingeSide && { hingeSide: formData.hingeSide }),
+        ...(formData.swingDirection && {
+          swingDirection: formData.swingDirection,
+        }),
+        ...(formData.uValue && { uValue: formData.uValue }),
+        ...(formData.hasWheels !== undefined && {
+          hasWheels: formData.hasWheels,
+        }),
+      };
+
+      // Use the material service to create the material with pictures
+      await materialService.createMaterialWithPictures(
+        materialData,
+        selectedFiles
+      );
+
       setIsSubmitting(false);
       setSnackbarOpen(true);
 
@@ -107,12 +146,15 @@ ${formData.uValue ? `U-Value: ${formData.uValue}` : ""}`;
       setTimeout(() => {
         navigate("/materials");
       }, 2000);
-    }, 1500);
+    } catch (error) {
+      console.error("Error creating material:", error);
+      setIsSubmitting(false);
+      // You could add error handling here (like showing an error message)
+    }
   };
-
   const isStepValid = () => {
     if (activeStep === 0) {
-      return !!selectedFile;
+      return selectedFiles.length > 0;
     }
 
     if (activeStep === 1) {
@@ -156,15 +198,15 @@ ${formData.uValue ? `U-Value: ${formData.uValue}` : ""}`;
     switch (step) {
       case 0:
         return (
-          <Box sx={{ maxWidth: 600, mx: "auto" }}>
+          <Box sx={{ maxWidth: 800, mx: "auto" }}>
             <Typography variant="h6" gutterBottom>
-              Upload Material Image
+              Upload Material Images
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
-              Please upload a clear image of the material. This will help in
-              identification and categorization.
+              Please upload clear images of the material. You can upload
+              multiple images to show different angles or details.
             </Typography>
-            <FileUploader onFileSelect={handleFileSelect} />
+            <MultiFileUploader onFileSelect={handleFileSelect} maxFiles={5} />
           </Box>
         );
       case 1:
@@ -191,51 +233,61 @@ ${formData.uValue ? `U-Value: ${formData.uValue}` : ""}`;
 
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
+                {" "}
                 <Paper sx={{ p: 2, height: "100%" }}>
                   <Typography
                     variant="subtitle1"
                     fontWeight="medium"
                     gutterBottom
                   >
-                    Material Image
+                    Material Images
                   </Typography>
                   <Divider sx={{ mb: 2 }} />
-                  {selectedFile && (
-                    <Box
-                      sx={{
-                        height: 200,
-                        backgroundColor: "#f5f5f5",
-                        borderRadius: 1,
-                        overflow: "hidden",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <img
-                        src={URL.createObjectURL(selectedFile)}
-                        alt="Material preview"
-                        style={{
-                          maxWidth: "100%",
-                          maxHeight: "100%",
-                          objectFit: "contain",
-                        }}
-                      />
+                  {selectedFiles.length > 0 ? (
+                    <Box>
+                      <Grid container spacing={1}>
+                        {selectedFiles.map((file, index) => (
+                          <Grid item xs={6} key={index}>
+                            <Box
+                              sx={{
+                                height: 100,
+                                backgroundColor: "#f5f5f5",
+                                borderRadius: 1,
+                                overflow: "hidden",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                mb: 1,
+                              }}
+                            >
+                              <img
+                                src={URL.createObjectURL(file)}
+                                alt={`Material preview ${index + 1}`}
+                                style={{
+                                  maxWidth: "100%",
+                                  maxHeight: "100%",
+                                  objectFit: "contain",
+                                }}
+                              />
+                            </Box>
+                          </Grid>
+                        ))}
+                      </Grid>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 1 }}
+                      >
+                        {selectedFiles.length}{" "}
+                        {selectedFiles.length === 1 ? "image" : "images"}{" "}
+                        selected
+                      </Typography>
                     </Box>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No images selected
+                    </Typography>
                   )}
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 1 }}
-                  >
-                    {selectedFile?.name} (
-                    {(selectedFile?.size || 0) / 1024 / 1024 > 0.1
-                      ? `${((selectedFile?.size || 0) / 1024 / 1024).toFixed(
-                          2
-                        )} MB`
-                      : `${((selectedFile?.size || 0) / 1024).toFixed(0)} KB`}
-                    )
-                  </Typography>
                 </Paper>
               </Grid>
 

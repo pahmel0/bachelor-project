@@ -165,22 +165,23 @@ public class MaterialServiceImpl implements MaterialService {
         }
         
         return savedDto;
-    }
-
-    // Helper method to create the appropriate material instance
+    }    // Helper method to create the appropriate material instance
     private MaterialRecord createMaterialInstance(MaterialRecordDTO dto) {
         String materialType = dto.getMaterialType();
         
-        switch (materialType) {
-            case "Window":
+        // Handle the material type in a case-insensitive manner
+        switch (materialType.toUpperCase()) {
+            case "WINDOW":
                 return new Window();
-            case "Door":
+            case "DOOR":
                 return new Door();
-            case "Desk":
+            case "DESK":
                 return new Desk();
-            case "DrawerUnit":
+            case "DRAWER_UNIT":
+            case "DRAWERUNIT":
                 return new DrawerUnit();
-            case "OfficeCabinet":
+            case "OFFICE_CABINET":
+            case "OFFICECABINET":
                 return new OfficeCabinet();
             default:
                 throw new UnsupportedOperationException("Unsupported material type: " + materialType);
