@@ -80,6 +80,7 @@ A fullstack web application for tracking, filtering, and managing reusable furni
 ### 3. Frotend Setup
 
 - cd frontend
+- npm install(Installs Node modules)
 - npm run dev
 
 - The application can be accessed at [http://localhost:5173](http://localhost:5173)
